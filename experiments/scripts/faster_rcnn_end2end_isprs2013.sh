@@ -29,11 +29,11 @@ echo Logging output to "$LOG"
 NET_INIT=data/imagenet_models/${NET}.v2.caffemodel
 
 time ./tools/train_net.py --gpu ${GPU_ID} \
-  --solver models/${NET}/faster_rcnn_end2end/solver.prototxt \
+  --solver models/${NET}/faster_rcnn_end2end_isprs2013/solver.prototxt \
   --weights ${NET_INIT} \
   --imdb ${DATASET_TRAIN} \
   --iters ${ITERS} \
-  --cfg experiments/cfgs/faster_rcnn_end2end.yml \
+  --cfg experiments/cfgs/faster_rcnn_end2end_isprs2013.yml \
   ${EXTRA_ARGS}
 
 set +x
@@ -41,8 +41,8 @@ NET_FINAL=`grep -B 1 "done solving" ${LOG} | grep "Wrote snapshot" | awk '{print
 set -x
 
 time ./tools/test_net.py --gpu ${GPU_ID} \
-  --def models/${NET}/faster_rcnn_end2end/test.prototxt \
+  --def models/${NET}/faster_rcnn_end2end_isprs2013/test.prototxt \
   --net ${NET_FINAL} \
   --imdb ${DATASET_TEST} \
-  --cfg experiments/cfgs/faster_rcnn_end2end.yml \
+  --cfg experiments/cfgs/faster_rcnn_end2end_isprs2013.yml \
   ${EXTRA_ARGS}
