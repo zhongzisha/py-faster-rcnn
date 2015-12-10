@@ -27,10 +27,10 @@ class pascal_voc(datasets.imdb):
         self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)
         if int(self._year) == 2013:
             self._classes = ('__background__', # always index 0
-                             'impervousSurfaces',
-                             'building',
-                             'lowVegetation',
-                             'tree',
+                             # 'impervousSurfaces',
+                             # 'building',
+                             # 'lowVegetation',
+                             # 'tree',
                              'car')
         else:
             self._classes = ('__background__', # always index 0
