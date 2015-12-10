@@ -22,7 +22,7 @@ def _selective_search_IJCV_top_k(split, year, top_k):
     return imdb
 
 # Set up voc_<year>_<split> using selective search "fast" mode
-for year in ['2007', '2012']:
+for year in ['2007', '2012', '2013']:
     for split in ['train', 'val', 'trainval', 'test']:
         name = 'voc_{}_{}'.format(year, split)
         __sets[name] = (lambda split=split, year=year:
@@ -31,7 +31,7 @@ for year in ['2007', '2012']:
 # Set up voc_<year>_<split>_top_<k> using selective search "quality" mode
 # but only returning the first k boxes
 for top_k in np.arange(1000, 11000, 1000):
-    for year in ['2007', '2012']:
+    for year in ['2007', '2012', '2013']:
         for split in ['train', 'val', 'trainval', 'test']:
             name = 'voc_{}_{}_top_{:d}'.format(year, split, top_k)
             __sets[name] = (lambda split=split, year=year, top_k=top_k:
