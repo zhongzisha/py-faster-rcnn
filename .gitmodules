@@ -1,3 +1,0 @@
-[submodule "caffe-fast-rcnn"]
-	path = caffe-fast-rcnn
-	url = http://ubuntu@159.226.178.176/git/caffe-fast-rcnn
