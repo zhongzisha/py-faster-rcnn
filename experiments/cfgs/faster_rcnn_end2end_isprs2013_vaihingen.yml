@@ -1,4 +1,4 @@
-EXP_DIR: faster_rcnn_end2end_isprs2013
+EXP_DIR: faster_rcnn_end2end_isprs2013_vaihingen
 TRAIN:
   HAS_RPN: True
   IMS_PER_BATCH: 1
