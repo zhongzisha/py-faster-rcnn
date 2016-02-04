@@ -31,14 +31,14 @@ class pascal_voc(datasets.imdb):
                              # 'building',
                              # 'lowVegetation',
                              # 'tree',
-                             'car')
+                             'Car')
         elif int(self._year) == 2014:
             self._classes = ('__background__', # always index 0
                              # 'impervousSurfaces',
                              # 'building',
                              # 'lowVegetation',
                              # 'tree',
-                             'car')
+                             'Car')
         else:
             self._classes = ('__background__', # always index 0
                              'aeroplane', 'bicycle', 'bird', 'boat',
