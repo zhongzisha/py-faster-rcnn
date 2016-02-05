@@ -53,8 +53,8 @@ res.ap_auc = ap_auc;
 save([output_dir '/' cls '_pr.mat'], ...
      'res', 'recall', 'prec', 'ap', 'ap_auc');
 
-if rm_res
-  delete(res_fn);
-end
+% if rm_res
+%   delete(res_fn);
+% end
 
 rmpath(fullfile(VOCopts.datadir, 'VOCcode'));
