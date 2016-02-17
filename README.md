@@ -10,7 +10,7 @@ In particular, this Python port
  - is ~10% slower at test-time, because some operations execute on the CPU in Python layers (e.g., 220ms / image vs. 200ms / image for VGG16)
  - gives similar, but not exactly the same, mAP as the MATLAB version
  - is *not compatible* with models trained using the MATLAB code due to the minor implementation differences
- - **includes approximate joint training** that is 1.5x faster than alternating optimization (for VGG16) -- see these [slides](https://www.dropbox.com/s/gpvbaf9o4et9d5v/iccv15_tutorial_training_faster.pdf?dl=0) for more information
+ - **includes approximate joint training** that is 1.5x faster than alternating optimization (for VGG16) -- see these [slides](https://www.dropbox.com/s/xtr4yd4i5e0vw8g/iccv15_tutorial_training_rbg.pdf?dl=0) for more information
 
 # *Faster* R-CNN: Towards Real-Time Object Detection with Region Proposal Networks
 
@@ -59,12 +59,13 @@ If you find Faster R-CNN useful in your research, please consider citing:
 
   You can download my [Makefile.config](http://www.cs.berkeley.edu/~rbg/fast-rcnn-data/Makefile.config) for reference.
 2. Python packages you might not have: `cython`, `python-opencv`, `easydict`
-3. [optional] MATLAB (required for PASCAL VOC evaluation only)
+3. [Optional] MATLAB is required for **official** PASCAL VOC evaluation only. The code now includes unofficial Python evaluation code.
 
 ### Requirements: hardware
 
 1. For training smaller networks (ZF, VGG_CNN_M_1024) a good GPU (e.g., Titan, K20, K40, ...) with at least 3G of memory suffices
-2. For training with VGG16, you'll need a K40 (~11G of memory)
+2. For training Fast R-CNN with VGG16, you'll need a K40 (~11G of memory)
+3. For training the end-to-end version of Faster R-CNN with VGG16, 3G of GPU memory is sufficient (using CUDNN)
 
 ### Installation (sufficient for the demo)
 
@@ -127,9 +128,9 @@ The demo performs detection using a VGG16 network trained for detection on PASCA
 1. Download the training, validation, test data and VOCdevkit
 
 	```Shell
-	wget http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2007/VOCtrainval_06-Nov-2007.tar
-	wget http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2007/VOCtest_06-Nov-2007.tar
-	wget http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2007/VOCdevkit_08-Jun-2007.tar
+	wget http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtrainval_06-Nov-2007.tar
+	wget http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtest_06-Nov-2007.tar
+	wget http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCdevkit_08-Jun-2007.tar
 	```
 
 2. Extract all of these tars into one directory named `VOCdevkit`
@@ -198,4 +199,4 @@ cd $FRCN_ROOT
 #   --set EXP_DIR seed_rng1701 RNG_SEED 1701
 ```
 
-This method trains the RPN module jointly with the Fast R-CNN network, rather than alternating between training the two. It results in faster (~ 1.5x speedup) training times and similar detection accuracy. See these [slides](https://www.dropbox.com/s/gpvbaf9o4et9d5v/iccv15_tutorial_training_faster.pdf?dl=0) for more details.
+This method trains the RPN module jointly with the Fast R-CNN network, rather than alternating between training the two. It results in faster (~ 1.5x speedup) training times and similar detection accuracy. See these [slides](https://www.dropbox.com/s/xtr4yd4i5e0vw8g/iccv15_tutorial_training_rbg.pdf?dl=0) for more details.
