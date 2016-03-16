@@ -26,9 +26,10 @@ def get_minibatch(roidb, num_classes):
     fg_rois_per_image = np.round(cfg.TRAIN.FG_FRACTION * rois_per_image)
 
     # Get the input image blob, formatted for caffe
-    im_blob, im_scales = _get_image_blob(roidb, random_scale_inds)
+    # im_blob, im_scales = _get_image_blob(roidb, random_scale_inds)
+    im_blob, dsm_blob, im_scales = _get_image_blob(roidb, random_scale_inds)
 
-    blobs = {'data': im_blob}
+    blobs = {'data': im_blob, 'dsm': dsm_blob}
 
     if cfg.TRAIN.HAS_RPN:
         assert len(im_scales) == 1, "Single batch only"
@@ -126,27 +127,55 @@ def _sample_rois(roidb, fg_rois_per_image, rois_per_image, num_classes):
 
     return labels, overlaps, rois, bbox_targets, bbox_inside_weights
 
+# def _get_image_blob(roidb, scale_inds):
+#     """Builds an input blob from the images in the roidb at the specified
+#     scales.
+#     """
+#     num_images = len(roidb)
+#     processed_ims = []
+#     im_scales = []
+#     for i in xrange(num_images): 
+#         im = cv2.imread(roidb[i]['image']) 
+#         if roidb[i]['flipped']:
+#             im = im[:, ::-1, :] 
+#         target_size = cfg.TRAIN.SCALES[scale_inds[i]]
+#         im, im_scale = prep_im_for_blob(im, cfg.PIXEL_MEANS, target_size,
+#                                         cfg.TRAIN.MAX_SIZE)
+#         im_scales.append(im_scale)
+#         processed_ims.append(im)
+# 
+#     # Create a blob to hold the input images
+#     blob = im_list_to_blob(processed_ims)
+# 
+#     return blob, im_scales
+
 def _get_image_blob(roidb, scale_inds):
     """Builds an input blob from the images in the roidb at the specified
     scales.
     """
     num_images = len(roidb)
     processed_ims = []
+    processed_dsms = []
     im_scales = []
     for i in xrange(num_images):
-        im = cv2.imread(roidb[i]['image'])
+        im_name = roidb[i]['image']
+        dsm_name = im_name[:-4]+'_depth.jpg'
+        im = cv2.imread(im_name)
+        dsm = cv2.imread(dsm_name, cv2.IMREAD_GRAYSCALE)
         if roidb[i]['flipped']:
             im = im[:, ::-1, :]
+            dsm = dsm[:, ::-1]
         target_size = cfg.TRAIN.SCALES[scale_inds[i]]
-        im, im_scale = prep_im_for_blob(im, cfg.PIXEL_MEANS, target_size,
+        im, dsm, im_scale = prep_im_for_blob(im, dsm, cfg.PIXEL_MEANS, cfg.DSM_MEANS, target_size,
                                         cfg.TRAIN.MAX_SIZE)
         im_scales.append(im_scale)
         processed_ims.append(im)
+        processed_dsms.append(dsm)
 
     # Create a blob to hold the input images
-    blob = im_list_to_blob(processed_ims)
+    blob, dsm_blob = im_list_to_blob(processed_ims, processed_dsms)
 
-    return blob, im_scales
+    return blob, dsm_blob, im_scales
 
 def _project_im_rois(im_rois, im_scale_factor):
     """Project image RoIs into the rescaled training image."""
