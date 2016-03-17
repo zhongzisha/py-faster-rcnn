@@ -35,23 +35,27 @@ def im_list_to_blob(ims, dsms=None):
     """
     max_shape = np.array([im.shape for im in ims]).max(axis=0)
     num_images = len(ims)
+    num_dsms = len(dsms)
+    has_dsm = False
+    if num_dsms == num_images:
+        has_dsm = True
     blob = np.zeros((num_images, max_shape[0], max_shape[1], 3), 
                     dtype=np.float32)
     dsm_blob = None 
-    if dsms is not None:
+    if has_dsm:
         dsm_blob = np.zeros((num_images, max_shape[0], max_shape[1], 1), 
                             dtype=np.float32)
     for i in xrange(num_images):
         im = ims[i]
         blob[i, 0:im.shape[0], 0:im.shape[1], :] = im
-        if dsms is not None:
+        if has_dsm:
             dsm = dsms[i]
             dsm_blob[i, 0:im.shape[0], 0:im.shape[1], 0] = dsm
     # Move channels (axis 3) to axis 1
     # Axis order will become: (batch elem, channel, height, width)
     channel_swap = (0, 3, 1, 2)
     blob = blob.transpose(channel_swap)
-    if dsms is not None:
+    if has_dsm:
         dsm_blob = dsm_blob.transpose(channel_swap)
     return blob, dsm_blob
 
