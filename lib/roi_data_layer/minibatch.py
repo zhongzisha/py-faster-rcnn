@@ -29,7 +29,9 @@ def get_minibatch(roidb, num_classes):
     # im_blob, im_scales = _get_image_blob(roidb, random_scale_inds)
     im_blob, dsm_blob, im_scales = _get_image_blob(roidb, random_scale_inds)
 
-    blobs = {'data': im_blob, 'dsm': dsm_blob}
+    blobs = {'data': im_blob}
+    if cfg.TRAIN.HAS_DSM == True:
+        blobs['dsm'] = dsm_blob
 
     if cfg.TRAIN.HAS_RPN:
         assert len(im_scales) == 1, "Single batch only"
@@ -159,18 +161,24 @@ def _get_image_blob(roidb, scale_inds):
     im_scales = []
     for i in xrange(num_images):
         im_name = roidb[i]['image']
-        dsm_name = im_name[:-4]+'_depth.jpg'
         im = cv2.imread(im_name)
-        dsm = cv2.imread(dsm_name, cv2.IMREAD_GRAYSCALE)
+        dsm = None
+        if cfg.TRAIN.HAS_DSM == True:
+            dsm_name = im_name[:-4]+'_depth.jpg'
+            dsm = cv2.imread(dsm_name, cv2.IMREAD_GRAYSCALE)
         if roidb[i]['flipped']:
             im = im[:, ::-1, :]
-            dsm = dsm[:, ::-1]
+            if cfg.TRAIN.HAS_DSM == True:
+                dsm = dsm[:, ::-1]
         target_size = cfg.TRAIN.SCALES[scale_inds[i]]
-        im, dsm, im_scale = prep_im_for_blob(im, dsm, cfg.PIXEL_MEANS, cfg.DSM_MEANS, target_size,
-                                        cfg.TRAIN.MAX_SIZE)
+        if cfg.TRAIN.HAS_DSM == True:
+            im, dsm, im_scale = prep_im_for_blob(im, cfg.PIXEL_MEANS, target_size, cfg.TRAIN.MAX_SIZE, dsm, cfg.DSM_MEANS)
+        else:
+            im, dsm, im_scale = prep_im_for_blob(im, cfg.PIXEL_MEANS, target_size, cfg.TRAIN.MAX_SIZE)
         im_scales.append(im_scale)
         processed_ims.append(im)
-        processed_dsms.append(dsm)
+        if cfg.TRAIN.HAS_DSM == True:
+            processed_dsms.append(dsm)
 
     # Create a blob to hold the input images
     blob, dsm_blob = im_list_to_blob(processed_ims, processed_dsms)

@@ -98,10 +98,11 @@ class RoIDataLayer(caffe.Layer):
         idx += 1
         
         # the following is for depth image
-        top[idx].reshape(cfg.TRAIN.IMS_PER_BATCH, 1,
-            max(cfg.TRAIN.SCALES), cfg.TRAIN.MAX_SIZE)
-        self._name_to_top_map['dsm'] = idx
-        idx += 1
+        if cfg.TRAIN.HAS_DSM == True:
+            top[idx].reshape(cfg.TRAIN.IMS_PER_BATCH, 1, 
+                             max(cfg.TRAIN.SCALES), cfg.TRAIN.MAX_SIZE)
+            self._name_to_top_map['dsm'] = idx
+            idx += 1
         
 
         if cfg.TRAIN.HAS_RPN:

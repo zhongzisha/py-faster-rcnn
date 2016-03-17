@@ -20,7 +20,43 @@ import heapq
 from utils.blob import im_list_to_blob
 import os
 
-def _get_image_blob(im):
+# def _get_image_blob(im):
+#     """Converts an image into a network input.
+# 
+#     Arguments:
+#         im (ndarray): a color image in BGR order
+# 
+#     Returns:
+#         blob (ndarray): a data blob holding an image pyramid
+#         im_scale_factors (list): list of image scales (relative to im) used
+#             in the image pyramid
+#     """
+#     im_orig = im.astype(np.float32, copy=True)
+#     im_orig -= cfg.PIXEL_MEANS
+# 
+#     im_shape = im_orig.shape
+#     im_size_min = np.min(im_shape[0:2])
+#     im_size_max = np.max(im_shape[0:2])
+# 
+#     processed_ims = []
+#     im_scale_factors = []
+# 
+#     for target_size in cfg.TEST.SCALES:
+#         im_scale = float(target_size) / float(im_size_min)
+#         # Prevent the biggest axis from being more than MAX_SIZE
+#         if np.round(im_scale * im_size_max) > cfg.TEST.MAX_SIZE:
+#             im_scale = float(cfg.TEST.MAX_SIZE) / float(im_size_max)
+#         im = cv2.resize(im_orig, None, None, fx=im_scale, fy=im_scale,
+#                         interpolation=cv2.INTER_LINEAR)
+#         im_scale_factors.append(im_scale)
+#         processed_ims.append(im)
+# 
+#     # Create a blob to hold the input images
+#     blob = im_list_to_blob(processed_ims)
+# 
+#     return blob, np.array(im_scale_factors)
+
+def _get_image_blob(im, dsm=None):
     """Converts an image into a network input.
 
     Arguments:
@@ -34,11 +70,16 @@ def _get_image_blob(im):
     im_orig = im.astype(np.float32, copy=True)
     im_orig -= cfg.PIXEL_MEANS
 
+    if dsm is not None:
+        dsm_orig = dsm.astype(np.float32, copy=True)
+        dsm_orig -= cfg.DSM_MEANS
+
     im_shape = im_orig.shape
     im_size_min = np.min(im_shape[0:2])
     im_size_max = np.max(im_shape[0:2])
 
     processed_ims = []
+    processed_dsms = []
     im_scale_factors = []
 
     for target_size in cfg.TEST.SCALES:
@@ -50,11 +91,18 @@ def _get_image_blob(im):
                         interpolation=cv2.INTER_LINEAR)
         im_scale_factors.append(im_scale)
         processed_ims.append(im)
+        if dsm is not None:
+            dsm = cv2.resize(dsm_orig, None, None, fx=im_scale, fy=im_scale, 
+                             interpolation=cv2.INTER_LINEAR)
+            processed_dsms.append(dsm)
 
     # Create a blob to hold the input images
-    blob = im_list_to_blob(processed_ims)
+    if dsm is not None:
+        blob, dsm_blob = im_list_to_blob(processed_ims, processed_dsms)
+    else:
+        blob, dsm_blob = im_list_to_blob(processed_ims)
 
-    return blob, np.array(im_scale_factors)
+    return blob, dsm_blob, np.array(im_scale_factors)
 
 def _get_rois_blob(im_rois, im_scale_factors):
     """Converts RoIs into network inputs.
@@ -98,15 +146,17 @@ def _project_im_rois(im_rois, scales):
 
     return rois, levels
 
-def _get_blobs(im, rois):
+def _get_blobs(im, dsm, rois):
     """Convert an image and RoIs within that image into network inputs."""
     blobs = {'data' : None, 'rois' : None}
-    blobs['data'], im_scale_factors = _get_image_blob(im)
+    if cfg.TEST.HAS_DSM == True:
+        blobs['dsm'] = None
+    blobs['data'], blobs['dsm'], im_scale_factors = _get_image_blob(im, dsm)
     if not cfg.TEST.HAS_RPN:
         blobs['rois'] = _get_rois_blob(rois, im_scale_factors)
     return blobs, im_scale_factors
 
-def im_detect(net, im, boxes=None):
+def im_detect(net, im, dsm=None, boxes=None):
     """Detect object classes in an image given object proposals.
 
     Arguments:
@@ -119,7 +169,7 @@ def im_detect(net, im, boxes=None):
             background as object category 0)
         boxes (ndarray): R x (4*K) array of predicted bounding boxes
     """
-    blobs, im_scales = _get_blobs(im, boxes)
+    blobs, im_scales = _get_blobs(im, dsm, boxes)
 
     # When mapping from image ROIs to feature map ROIs, there's some aliasing
     # (some distinct image ROIs get mapped to the same feature ROI).
@@ -141,6 +191,8 @@ def im_detect(net, im, boxes=None):
 
     # reshape network inputs
     net.blobs['data'].reshape(*(blobs['data'].shape))
+    if cfg.TEST.HAS_DSM:
+        net.blobs['dsm'].reshape(*(blobs['dsm'].shape))
     if cfg.TEST.HAS_RPN:
         net.blobs['im_info'].reshape(*(blobs['im_info'].shape))
     else:
@@ -148,6 +200,8 @@ def im_detect(net, im, boxes=None):
 
     # do forward
     forward_kwargs = {'data': blobs['data'].astype(np.float32, copy=False)}
+    if cfg.TEST.HAS_DSM:
+        forward_kwargs['dsm'] = blobs['dsm'].astype(np.float32, copy=False)
     if cfg.TEST.HAS_RPN:
         forward_kwargs['im_info'] = blobs['im_info'].astype(np.float32, copy=False)
     else:
@@ -259,8 +313,15 @@ def test_net(net, imdb):
         else:
             box_proposals = roidb[i]['boxes'][roidb[i]['gt_classes'] == 0]
         im = cv2.imread(imdb.image_path_at(i))
+        dsm = None
+        if cfg.TEST.HAS_DSM == True: 
+            dsm_name = imdb.image_path_at(i)[:-4]+'_depth.jpg'
+            dsm = cv2.imread(dsm_name, cv2.IMREAD_GRAYSCALE)
         _t['im_detect'].tic()
-        scores, boxes = im_detect(net, im, box_proposals)
+        if cfg.TEST.HAS_DSM == True:
+            scores, boxes = im_detect(net, im, dsm, box_proposals)
+        else:
+            scores, boxes = im_detect(net, im, box_proposals)
         _t['im_detect'].toc()
 
         _t['misc'].tic()
