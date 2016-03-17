@@ -22,17 +22,16 @@ input_shape {
   dim: 3
 }
 
- layer {
-	name: "data_dsm"
-	bottom: "data"
-	bottom: "dsm"
-	top: "data_dsm"
-	type: "Concat"
-	concat_param {
-	 	axis: 1 # concatenate along the channel
-	}
-}
-
+# layer {
+#	name: "data_dsm"
+#	bottom: "data"
+#	bottom: "dsm"
+#	top: "data_dsm"
+#	type: "Concat"
+#	concat_param {
+#	 	axis: 1 # concatenate along the channel
+#	}
+#}
 
 #========= conv1-conv5 ============
 
@@ -175,12 +174,177 @@ layer {
 	top: "conv5"
 }
 
+
+#========= conv1 ~ conv5 for dsm ============
+
+layer {
+	name: "conv1_dsm"
+	type: "Convolution"
+	bottom: "dsm"
+	top: "conv1_dsm"
+	param { lr_mult: 1.0 }
+	param { lr_mult: 2.0 }
+	convolution_param {
+		num_output: 96
+		kernel_size: 7
+		pad: 3
+		stride: 2 
+	}
+}
+layer {
+	name: "relu1_dsm"
+	type: "ReLU"
+	bottom: "conv1_dsm"
+	top: "conv1_dsm"
+}
+layer {
+	name: "norm1_dsm"
+	type: "LRN"
+	bottom: "conv1_dsm"
+	top: "norm1_dsm"
+	lrn_param {
+		local_size: 3
+		alpha: 0.00005
+		beta: 0.75
+		norm_region: WITHIN_CHANNEL
+	}
+}
+layer {
+	name: "pool1_dsm"
+	type: "Pooling"
+	bottom: "norm1_dsm"
+	top: "pool1_dsm"
+	pooling_param {
+		kernel_size: 3
+		stride: 2
+		pad: 1
+		pool: MAX
+	}
+}
+layer {
+	name: "conv2_dsm"
+	type: "Convolution"
+	bottom: "pool1_dsm"
+	top: "conv2_dsm"
+	param { lr_mult: 1.0 }
+	param { lr_mult: 2.0 }
+	convolution_param {
+		num_output: 256
+		kernel_size: 5
+		pad: 2
+		stride: 2
+	}
+}
+layer {
+	name: "relu2_dsm"
+	type: "ReLU"
+	bottom: "conv2_dsm"
+	top: "conv2_dsm"
+}
+layer {
+	name: "norm2_dsm"
+	type: "LRN"
+	bottom: "conv2_dsm"
+	top: "norm2_dsm"
+	lrn_param {
+		local_size: 3
+		alpha: 0.00005
+		beta: 0.75
+		norm_region: WITHIN_CHANNEL
+	}
+}
+layer {
+	name: "pool2_dsm"
+	type: "Pooling"
+	bottom: "norm2_dsm"
+	top: "pool2_dsm"
+	pooling_param {
+		kernel_size: 3
+		stride: 2
+		pad: 1
+		pool: MAX
+	}
+}
+layer {
+	name: "conv3_dsm"
+	type: "Convolution"
+	bottom: "pool2_dsm"
+	top: "conv3_dsm"
+	param { lr_mult: 1.0 }
+	param { lr_mult: 2.0 }
+	convolution_param {
+		num_output: 384
+		kernel_size: 3
+		pad: 1
+		stride: 1
+	}
+}
+layer {
+	name: "relu3_dsm"
+	type: "ReLU"
+	bottom: "conv3_dsm"
+	top: "conv3_dsm"
+}
+layer {
+	name: "conv4_dsm"
+	type: "Convolution"
+	bottom: "conv3_dsm"
+	top: "conv4_dsm"
+	param { lr_mult: 1.0 }
+	param { lr_mult: 2.0 }
+	convolution_param {
+		num_output: 384
+		kernel_size: 3
+		pad: 1
+		stride: 1
+	}
+}
+layer {
+	name: "relu4_dsm"
+	type: "ReLU"
+	bottom: "conv4_dsm"
+	top: "conv4_dsm"
+}
+layer {
+	name: "conv5_dsm"
+	type: "Convolution"
+	bottom: "conv4_dsm"
+	top: "conv5_dsm"
+	param { lr_mult: 1.0 }
+	param { lr_mult: 2.0 }
+	convolution_param {
+		num_output: 256
+		kernel_size: 3
+		pad: 1
+		stride: 1
+	}
+}
+layer {
+	name: "relu5_dsm"
+	type: "ReLU"
+	bottom: "conv5_dsm"
+	top: "conv5_dsm"
+}
+
+#========= concate conv5 and conv5_dsm ===========
+layer {
+	name: "conv5_fusion"
+	bottom: "conv5"
+	bottom: "conv5_dsm"
+	top: "conv5_fusion"
+	type: "Concat"
+	concat_param {
+	 	axis: 1 # concatenate along the channel
+	}
+}
+
+
 #========= RPN ============
 
 layer {
   name: "rpn_conv/3x3"
   type: "Convolution"
-  bottom: "conv5"
+  bottom: "conv5_fusion"
   top: "rpn/output"
   convolution_param {
     num_output: 256
@@ -198,7 +362,7 @@ layer {
 #layer {
 #  name: "rpn_conv/3x3"
 #  type: "Convolution"
-#  bottom: "conv5"
+#  bottom: "conv5_fusion"
 #  top: "rpn_conv/3x3"
 #  param { lr_mult: 1.0 decay_mult: 1.0 }
 #  param { lr_mult: 2.0 decay_mult: 0 }
@@ -212,7 +376,7 @@ layer {
 #layer {
 #  name: "rpn_conv/5x5"
 #  type: "Convolution"
-#  bottom: "conv5"
+#  bottom: "conv5_fusion"
 #  top: "rpn_conv/5x5"
 #  param { lr_mult: 1.0 decay_mult: 1.0 }
 #  param { lr_mult: 2.0 decay_mult: 0 }
@@ -297,12 +461,28 @@ layer {
   }
 }
 
+#========= add a fully convolutional layer ======
+layer {
+	name: "conv5_fusion_reduced"
+	type: "Convolution"
+	bottom: "conv5_fusion"
+	top: "conv5_fusion_reduced"
+	param { lr_mult: 1.0 }
+	param { lr_mult: 2.0 }
+	convolution_param {
+		num_output: 256
+		kernel_size: 1
+		pad: 1
+		stride: 1
+	}
+}
+
 #========= RCNN ============
 
 layer {
   name: "roi_pool_conv5"
   type: "ROIPooling"
-  bottom: "conv5"
+  bottom: "conv5_fusion_reduced"
   bottom: "rois"
   top: "roi_pool_conv5"
   roi_pooling_param {
