@@ -35,7 +35,9 @@ def im_list_to_blob(ims, dsms=None):
     """
     max_shape = np.array([im.shape for im in ims]).max(axis=0)
     num_images = len(ims)
-    num_dsms = len(dsms)
+    num_dsms = 0
+    if dsms is not None:
+        num_dsms = len(dsms)
     has_dsm = False
     if num_dsms == num_images:
         has_dsm = True
