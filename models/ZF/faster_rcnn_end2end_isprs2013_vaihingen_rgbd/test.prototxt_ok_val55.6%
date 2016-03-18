@@ -53,7 +53,18 @@ layer {
 	bottom: "conv1"
 	top: "conv1"
 }
-
+layer {
+	name: "norm1"
+	type: "LRN"
+	bottom: "conv1"
+	top: "norm1"
+	lrn_param {
+		local_size: 3
+		alpha: 0.00005
+		beta: 0.75
+		norm_region: WITHIN_CHANNEL
+	}
+}
 layer {
 	name: "pool1"
 	type: "Pooling"
@@ -187,9 +198,21 @@ layer {
 	top: "conv1_dsm"
 }
 layer {
+	name: "norm1_dsm"
+	type: "LRN"
+	bottom: "conv1_dsm"
+	top: "norm1_dsm"
+	lrn_param {
+		local_size: 3
+		alpha: 0.00005
+		beta: 0.75
+		norm_region: WITHIN_CHANNEL
+	}
+}
+layer {
 	name: "pool1_dsm"
 	type: "Pooling"
-	bottom: "conv1_dsm"
+	bottom: "norm1_dsm"
 	top: "pool1_dsm"
 	pooling_param {
 		kernel_size: 3
@@ -219,9 +242,21 @@ layer {
 	top: "conv2_dsm"
 }
 layer {
+	name: "norm2_dsm"
+	type: "LRN"
+	bottom: "conv2_dsm"
+	top: "norm2_dsm"
+	lrn_param {
+		local_size: 3
+		alpha: 0.00005
+		beta: 0.75
+		norm_region: WITHIN_CHANNEL
+	}
+}
+layer {
 	name: "pool2_dsm"
 	type: "Pooling"
-	bottom: "conv2_dsm"
+	bottom: "norm2_dsm"
 	top: "pool2_dsm"
 	pooling_param {
 		kernel_size: 3
