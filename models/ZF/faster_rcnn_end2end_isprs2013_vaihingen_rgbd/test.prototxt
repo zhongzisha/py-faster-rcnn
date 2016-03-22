@@ -472,7 +472,7 @@ layer {
 layer {
   name: "bbox_pred"
   type: "InnerProduct"
-  bottom: "fc7"
+  bottom: "fc71"
   top: "bbox_pred"
   inner_product_param {
     num_output: 8
