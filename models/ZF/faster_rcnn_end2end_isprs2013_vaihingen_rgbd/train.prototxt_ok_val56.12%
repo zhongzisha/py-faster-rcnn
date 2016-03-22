@@ -531,12 +531,30 @@ layer {
   }
 }
 
+#========= add a fully convolutional layer ======
+layer {
+	name: "conv5_fusion_reduced"
+	type: "Convolution"
+	bottom: "conv5_fusion"
+	top: "conv5_fusion_reduced"
+	param { lr_mult: 1.0 }
+	param { lr_mult: 2.0 }
+	convolution_param {
+		num_output: 256
+		kernel_size: 1
+		pad: 1
+		stride: 1
+
+    weight_filler { type: "gaussian" std: 0.01 }
+    bias_filler { type: "constant" value: 0 }
+	}
+}
 
 #========= RCNN ============
 layer {
   name: "roi_pool_conv5"
   type: "ROIPooling"
-  bottom: "conv5_fusion" # "conv5_fusion_reduced"
+  bottom: "conv5_fusion_reduced"
   bottom: "rois"
   top: "roi_pool_conv5"
   roi_pooling_param {
@@ -547,18 +565,60 @@ layer {
 }
 
 layer {
-  name: "fc7"
+  name: "fc6"
   type: "InnerProduct"
   bottom: "roi_pool_conv5"
+  top: "fc6"
+  param { lr_mult: 1.0 }
+  param { lr_mult: 2.0 }
+  inner_product_param {
+    num_output: 4096
+  }
+}
+layer {
+  name: "relu6"
+  type: "ReLU"
+  bottom: "fc6"
+  top: "fc6"
+}
+layer {
+  name: "drop6"
+  type: "Dropout"
+  bottom: "fc6"
+  top: "fc6"
+  dropout_param {
+    dropout_ratio: 0.5
+    scale_train: false
+  }
+}
+layer {
+  name: "fc7"
+  type: "InnerProduct"
+  bottom: "fc6"
   top: "fc7"
   param { lr_mult: 1.0 }
   param { lr_mult: 2.0 }
   inner_product_param {
     num_output: 4096
-    weight_filler { type: "gaussian" std: 0.001 }
-    bias_filler { type: "constant" value: 0 }
   }
 }
+layer {
+  name: "relu7"
+  type: "ReLU"
+  bottom: "fc7"
+  top: "fc7"
+}
+layer {
+  name: "drop7"
+  type: "Dropout"
+  bottom: "fc7"
+  top: "fc7"
+  dropout_param {
+    dropout_ratio: 0.5
+    scale_train: false
+  }
+}
+
 #============ classification =============
 
 layer {
