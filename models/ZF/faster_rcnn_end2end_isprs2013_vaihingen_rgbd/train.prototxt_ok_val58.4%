@@ -583,16 +583,6 @@ layer {
     bias_filler { type: "constant" value: 0 }
   }
 }
-layer {
-  name: "drop71"
-  type: "Dropout"
-  bottom: "fc71"
-  top: "fc71"
-  dropout_param {
-    dropout_ratio: 0.5
-    scale_train: false
-  }
-}
 #============ classification =============
 
 layer {
