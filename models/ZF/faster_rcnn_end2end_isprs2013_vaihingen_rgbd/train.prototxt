@@ -186,7 +186,7 @@ layer {
 	param { lr_mult: 1.0 }
 	param { lr_mult: 2.0 }
 	convolution_param {
-		num_output: 8
+		num_output: 96
 		kernel_size: 7
 		pad: 3
 		stride: 2 
@@ -222,7 +222,7 @@ layer {
 	param { lr_mult: 1.0 }
 	param { lr_mult: 2.0 }
 	convolution_param {
-		num_output: 8
+		num_output: 256
 		kernel_size: 5
 		pad: 2
 		stride: 2
@@ -257,7 +257,7 @@ layer {
 	param { lr_mult: 1.0 }
 	param { lr_mult: 2.0 }
 	convolution_param {
-		num_output: 8
+		num_output: 384
 		kernel_size: 3
 		pad: 1
 		stride: 1
@@ -280,7 +280,7 @@ layer {
 	param { lr_mult: 1.0 }
 	param { lr_mult: 2.0 }
 	convolution_param {
-		num_output: 8
+		num_output: 384
 		kernel_size: 3
 		pad: 1
 		stride: 1
@@ -303,7 +303,7 @@ layer {
 	param { lr_mult: 1.0 }
 	param { lr_mult: 2.0 }
 	convolution_param {
-		num_output: 8
+		num_output: 256
 		kernel_size: 3
 		pad: 1
 		stride: 1
