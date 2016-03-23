@@ -452,12 +452,23 @@ layer {
   }
 }
 layer {
-  name: "fc71"
+  name: "fc61"
   type: "InnerProduct"
   bottom: "roi_pool_conv5"
-  top: "fc71" 
+  top: "fc61" 
   inner_product_param {
-    num_output: 4096
+    num_output: 1024
+  }
+}
+layer {
+  name: "fc71"
+  type: "InnerProduct"
+  bottom: "fc61"
+  top: "fc71"
+  param { lr_mult: 1.0 }
+  param { lr_mult: 2.0 }
+  inner_product_param {
+    num_output: 512
   }
 }
 layer {
