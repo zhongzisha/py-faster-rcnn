@@ -1,7 +1,7 @@
 EXP_DIR: faster_rcnn_end2end_isprs2013_vaihingen_rgbd
 TRAIN:
   HAS_RPN: True
-  HAS_DSM: True
+  HAS_DSM: False
   IMS_PER_BATCH: 1
   BBOX_NORMALIZE_TARGETS_PRECOMPUTED: True
   RPN_POSITIVE_OVERLAP: 0.7
@@ -9,4 +9,4 @@ TRAIN:
   PROPOSAL_METHOD: gt
 TEST:
   HAS_RPN: True
-  HAS_DSM: True
+  HAS_DSM: False
