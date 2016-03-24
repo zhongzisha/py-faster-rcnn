@@ -374,11 +374,11 @@ layer {
   bottom: "dsm"
   top: "conv1_1_dsm"
   param {
-    lr_mult: 0
+    lr_mult: 1.0
     decay_mult: 0
   }
   param {
-    lr_mult: 0
+    lr_mult: 2.0
     decay_mult: 0
   }
   convolution_param {
@@ -401,11 +401,11 @@ layer {
   bottom: "conv1_1_dsm"
   top: "conv1_2_dsm"
   param {
-    lr_mult: 0
+    lr_mult: 1.0
     decay_mult: 0
   }
   param {
-    lr_mult: 0
+    lr_mult: 2.0
     decay_mult: 0
   }
   convolution_param {
@@ -439,11 +439,11 @@ layer {
   bottom: "pool1_dsm"
   top: "conv2_1_dsm"
   param {
-    lr_mult: 0
+    lr_mult: 1.0
     decay_mult: 0
   }
   param {
-    lr_mult: 0
+    lr_mult: 2.0
     decay_mult: 0
   }
   convolution_param {
@@ -466,11 +466,11 @@ layer {
   bottom: "conv2_1_dsm"
   top: "conv2_2_dsm"
   param {
-    lr_mult: 0
+    lr_mult: 1.0
     decay_mult: 0
   }
   param {
-    lr_mult: 0
+    lr_mult: 2.0
     decay_mult: 0
   }
   convolution_param {
