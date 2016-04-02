@@ -3,4 +3,5 @@
 lib/build
 lib/pycocotools/_mask.c
 lib/pycocotools/_mask.so
-caffe-fast-rcnn
+caffe-fast-rcnn/
+output/
