@@ -11,7 +11,7 @@ import numpy as np
 import numpy.random as npr
 import cv2
 from fast_rcnn.config import cfg
-from utils.blob import prep_im_for_blob, im_list_to_blob
+from utils.blob import prep_im_for_blob, im_list_to_blob, prep_im_for_blob_with_seg, im_list_to_blob_with_seg
 
 def get_minibatch(roidb, num_classes):
     """Given a roidb, construct a minibatch sampled from it."""
@@ -27,11 +27,14 @@ def get_minibatch(roidb, num_classes):
 
     # Get the input image blob, formatted for caffe
     # im_blob, im_scales = _get_image_blob(roidb, random_scale_inds)
-    im_blob, dsm_blob, im_scales = _get_image_blob(roidb, random_scale_inds)
+    im_blob, dsm_blob, seg_blob, im_scales = _get_image_blob(roidb, random_scale_inds)
 
     blobs = {'data': im_blob}
     if cfg.TRAIN.HAS_DSM == True:
         blobs['dsm'] = dsm_blob
+
+    if cfg.TRAIN.HAS_SEG == True:
+        blobs['seg'] = seg_blob
 
     if cfg.TRAIN.HAS_RPN:
         assert len(im_scales) == 1, "Single batch only"
@@ -158,6 +161,7 @@ def _get_image_blob(roidb, scale_inds):
     num_images = len(roidb)
     processed_ims = []
     processed_dsms = []
+    processed_segs = []
     im_scales = []
     for i in xrange(num_images):
         im_name = roidb[i]['image']
@@ -166,24 +170,27 @@ def _get_image_blob(roidb, scale_inds):
         if cfg.TRAIN.HAS_DSM == True:
             dsm_name = im_name[:-4]+'_depth.jpg'
             dsm = cv2.imread(dsm_name, cv2.IMREAD_GRAYSCALE)
+        seg = None
+        if cfg.TRAIN.HAS_SEG == True:
+            seg_name = im_name.replace('JPEGImages','SegmentationClass').replace('jpg','png')
+            seg = cv2.imread(seg_name, cv2.IMREAD_GRAYSCALE)
         if roidb[i]['flipped']:
             im = im[:, ::-1, :]
             if cfg.TRAIN.HAS_DSM == True:
                 dsm = dsm[:, ::-1]
+            if cfg.TRAIN.HAS_SEG == True:
+                seg = seg[:, ::-1]
         target_size = cfg.TRAIN.SCALES[scale_inds[i]]
-        if cfg.TRAIN.HAS_DSM == True:
-            im, dsm, im_scale = prep_im_for_blob(im, cfg.PIXEL_MEANS, target_size, cfg.TRAIN.MAX_SIZE, dsm, cfg.DSM_MEANS)
-        else:
-            im, dsm, im_scale = prep_im_for_blob(im, cfg.PIXEL_MEANS, target_size, cfg.TRAIN.MAX_SIZE)
+        im, dsm, im_scale = prep_im_for_blob_with_seg(im, cfg.PIXEL_MEANS, target_size, cfg.TRAIN.MAX_SIZE, dsm=dsm, dsm_means=cfg.DSM_MEANS, seg=seg)
         im_scales.append(im_scale)
         processed_ims.append(im)
         if cfg.TRAIN.HAS_DSM == True:
             processed_dsms.append(dsm)
 
     # Create a blob to hold the input images
-    blob, dsm_blob = im_list_to_blob(processed_ims, processed_dsms)
+    blob, dsm_blob, seg_blob = im_list_to_blob_with_seg(ims=processed_ims, dsms=processed_dsms, segs=processed_segs) 
 
-    return blob, dsm_blob, im_scales
+    return blob, dsm_blob, seg_blob, im_scales
 
 def _project_im_rois(im_rois, im_scale_factor):
     """Project image RoIs into the rescaled training image."""

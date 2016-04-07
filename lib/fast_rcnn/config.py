@@ -126,6 +126,9 @@ __C.TRAIN.RPN_POSITIVE_WEIGHT = -1.0
 # if we have dsm image to train
 __C.TRAIN.HAS_DSM = False
 
+# if we have seg image to train
+__C.TRAIN.HAS_SEG = False
+
 #
 # Testing options
 #
@@ -167,6 +170,9 @@ __C.TEST.RPN_MIN_SIZE = 16
 
 # if we have dsm image to test
 __C.TEST.HAS_DSM = False
+
+# if we have seg image to test
+__C.TEST.HAS_SEG = False
 
 #
 # MISC
