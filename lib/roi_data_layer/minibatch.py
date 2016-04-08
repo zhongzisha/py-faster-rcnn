@@ -181,11 +181,13 @@ def _get_image_blob(roidb, scale_inds):
             if cfg.TRAIN.HAS_SEG == True:
                 seg = seg[:, ::-1]
         target_size = cfg.TRAIN.SCALES[scale_inds[i]]
-        im, dsm, im_scale = prep_im_for_blob_with_seg(im, cfg.PIXEL_MEANS, target_size, cfg.TRAIN.MAX_SIZE, dsm=dsm, dsm_means=cfg.DSM_MEANS, seg=seg)
+        im, dsm, seg, im_scale = prep_im_for_blob_with_seg(im, cfg.PIXEL_MEANS, target_size, cfg.TRAIN.MAX_SIZE, dsm=dsm, dsm_means=cfg.DSM_MEANS, seg=seg)
         im_scales.append(im_scale)
         processed_ims.append(im)
         if cfg.TRAIN.HAS_DSM == True:
             processed_dsms.append(dsm)
+        if cfg.TRAIN.HAS_SEG == True:
+            processed_dsms.append(seg)
 
     # Create a blob to hold the input images
     blob, dsm_blob, seg_blob = im_list_to_blob_with_seg(ims=processed_ims, dsms=processed_dsms, segs=processed_segs) 
