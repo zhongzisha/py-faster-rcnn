@@ -187,7 +187,7 @@ def _get_image_blob(roidb, scale_inds):
         if cfg.TRAIN.HAS_DSM == True:
             processed_dsms.append(dsm)
         if cfg.TRAIN.HAS_SEG == True:
-            processed_dsms.append(seg)
+            processed_segs.append(seg)
 
     # Create a blob to hold the input images
     blob, dsm_blob, seg_blob = im_list_to_blob_with_seg(ims=processed_ims, dsms=processed_dsms, segs=processed_segs) 
