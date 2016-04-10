@@ -3,7 +3,7 @@ layer {
   name: 'input-data'
   type: 'Python'
   top: 'data'
-  top: 'dsm'
+  # top: 'dsm'
   top: 'seg'
   top: 'im_info'
   top: 'gt_boxes'
@@ -14,11 +14,11 @@ layer {
   }
 }
 
-layer {
-  name: "salience_dsm"
-  type: "Salience"
-  bottom: dsm
-}
+# layer {
+#   name: "salience_dsm"
+#   type: "Salience"
+#   bottom: "dsm"
+# }
 
 layer {
   name: "conv1_1"
@@ -379,9 +379,9 @@ layer {
 #========= SegNet =========
 layer {
   bottom: "conv5_3"
-  top: "pool5"
-  top: "pool5_mask"
-  name: "pool5"
+  top: "pool51"
+  top: "pool51_mask"
+  name: "pool51"
   type: "Pooling"
   pooling_param {
     pool: MAX
@@ -392,9 +392,9 @@ layer {
 layer {
   name: "upsample5"
   type: "Upsample"
-  bottom: "pool5"
-  top: "pool5_D"
-  bottom: "pool5_mask"
+  bottom: "pool51"
+  top: "pool51_D"
+  bottom: "pool51_mask"
   upsample_param {
     scale: 2
     upsample_w: 32
@@ -402,7 +402,7 @@ layer {
   }
 }
 layer {
-  bottom: "pool5_D"
+  bottom: "pool51_D"
   top: "conv5_3_D"
   name: "conv5_3_D"
   type: "Convolution"
