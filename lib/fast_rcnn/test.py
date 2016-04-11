@@ -435,6 +435,6 @@ def test_net_with_seg(net, image_root, image_list, mapfile, num_classes, output_
               .format(i + 1, num_images, _t['im_detect'].average_time,
                       _t['misc'].average_time)
 
-    det_file = os.path.join(output_dir, os.path.basename(image_list) + '_detections.pkl')
+    det_file = os.path.join(output_dir, os.path.basename(image_list)[:-4] + '_detections.pkl')
     with open(det_file, 'wb') as f:
         cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
