@@ -49,9 +49,12 @@ def parse_args():
     parser.add_argument('--num_dets', dest='max_per_image',
                         help='max number of detections per image',
                         default=100, type=int)
-    parser.add_argument('--image_list', type=str, dest='image_list', default=None)
-    parser.add_argument('--mapfile', type=str, dest='mapfile', default=None)
-    parser.add_argument('--output_dir', type=str, dest='output_dir', default=None)
+    parser.add_argument('--image_list', type=str, dest='image_list', 
+                        help='a given image list to test', default=None)
+    parser.add_argument('--mapfile', type=str, dest='mapfile',
+                        help='a mapfile to be used to test', default=None)
+    parser.add_argument('--output_dir', type=str, dest='output_dir', 
+                        help='the output dir for saving results', default=None)
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -85,12 +88,11 @@ if __name__ == '__main__':
     net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
     net.name = os.path.splitext(os.path.basename(args.caffemodel))[0]
 
-    imdb = get_imdb(args.imdb_name)
-    imdb.competition_mode(args.comp_mode)
-    if not cfg.TEST.HAS_RPN:
-        imdb.set_proposal_method(cfg.TEST.PROPOSAL_METHOD)
-
     if args.image_list is None:
+        imdb = get_imdb(args.imdb_name)
+        imdb.competition_mode(args.comp_mode)
+        if not cfg.TEST.HAS_RPN:
+            imdb.set_proposal_method(cfg.TEST.PROPOSAL_METHOD)
         test_net(net, imdb, max_per_image=args.max_per_image, vis=args.vis)
     else:
         test_net_with_seg(net, args.image_list, args.mapfile, args.num_classes, args.output_dir)
