@@ -18,6 +18,8 @@ from fast_rcnn.nms_wrapper import nms
 import cPickle
 from utils.blob import im_list_to_blob
 import os
+import scipy
+import scipy.io
 
 # def _get_image_blob(im):
 #     """Converts an image into a network input.
@@ -235,7 +237,13 @@ def im_detect(net, im, dsm=None, boxes=None):
         scores = scores[inv_index, :]
         pred_boxes = pred_boxes[inv_index, :]
 
-    return scores, pred_boxes
+    pred_seg = None
+    if cfg.TEST.HAS_SEG:
+        seg_prob = net.blobs['seg_prob'].data
+        seg_output = np.squeeze(seg_prob[0,:,:,:])
+        pred_seg = np.argmax(seg_output, axis=0)
+
+    return scores, pred_boxes, pred_seg
 
 def vis_detections(im, class_name, dets, thresh=0.3):
     """Visual debugging of detections."""
@@ -307,17 +315,19 @@ def test_net(net, imdb, max_per_image=100, thresh=0.05, vis=False):
             # ground truth.
             box_proposals = roidb[i]['boxes'][roidb[i]['gt_classes'] == 0]
 
-        im = cv2.imread(imdb.image_path_at(i))
+        im_filepath = imdb.image_path_at(i)
+        im = cv2.imread(im_filepath)
         dsm = None
         if cfg.TEST.HAS_DSM == True: 
-            dsm_name = imdb.image_path_at(i)[:-4]+'_depth.jpg'
+            dsm_name = im_filepath[:-4]+'_depth.jpg'
             dsm = cv2.imread(dsm_name, cv2.IMREAD_GRAYSCALE)
-        _t['im_detect'].tic()
-        if cfg.TEST.HAS_DSM == True:
-            scores, boxes = im_detect(net, im, dsm, box_proposals)
-        else:
-            scores, boxes = im_detect(net, im, box_proposals)
+        _t['im_detect'].tic() 
+        scores, boxes, seg = im_detect(net, im, dsm, box_proposals)  
         _t['im_detect'].toc()
+        
+        if seg is not None:
+            seg_filepath = os.path.join(output_dir, os.path.basename(im_filepath)[:-4], '.png')
+            scipy.misc.toimage(ind, cmin=0, cmax=255).save(seg_filepath)
 
         _t['misc'].tic()
         # skip j = 0, because it's the background class
