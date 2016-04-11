@@ -4,8 +4,8 @@ input: "data"
 input_shape {
   dim: 1
   dim: 3
-  dim: 224
-  dim: 224
+  dim: 500
+  dim: 500
 }
 
 input: "im_info"
@@ -69,6 +69,7 @@ layer {
   type: "Pooling"
   bottom: "conv1_2"
   top: "pool1"
+  top: "pool1_mask"
   pooling_param {
     pool: MAX
     kernel_size: 2
@@ -130,6 +131,7 @@ layer {
   type: "Pooling"
   bottom: "conv2_2"
   top: "pool2"
+  top: "pool2_mask"
   pooling_param {
     pool: MAX
     kernel_size: 2
@@ -216,6 +218,7 @@ layer {
   type: "Pooling"
   bottom: "conv3_3"
   top: "pool3"
+  top: "pool3_mask"
   pooling_param {
     pool: MAX
     kernel_size: 2
@@ -302,6 +305,7 @@ layer {
   type: "Pooling"
   bottom: "conv4_3"
   top: "pool4"
+  top: "pool4_mask"
   pooling_param {
     pool: MAX
     kernel_size: 2
