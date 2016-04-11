@@ -326,7 +326,7 @@ def test_net(net, imdb, max_per_image=100, thresh=0.05, vis=False):
         _t['im_detect'].toc()
         
         if seg is not None:
-            seg_filepath = os.path.join(output_dir, os.path.basename(im_filepath)[:-4], '.png')
+            seg_filepath = os.path.join(output_dir, os.path.basename(im_filepath)[:-4] + '.png') 
             print seg.shape
             print seg_filepath + ' done!'
             scipy.misc.toimage(seg, cmin=0, cmax=255).save(seg_filepath) 
