@@ -391,7 +391,7 @@ def test_net_with_seg(net, image_root, image_list, mapfile, num_classes, output_
         # filter out any ground truth boxes 
         box_proposals = None 
 
-        im_filepath = image_root + files[i].split(' ')[0] 
+        im_filepath = image_root + files[i].split(' ')[0]
         print im_filepath
         im = cv2.imread(im_filepath)
         dsm = None
@@ -403,7 +403,9 @@ def test_net_with_seg(net, image_root, image_list, mapfile, num_classes, output_
         _t['im_detect'].toc()
         
         if seg is not None:
-            seg_filepath = os.path.join(output_dir, os.path.basename(im_filepath)[:-4] + '.png') 
+            i1 = im_filepath.rindex('/')
+            i2 = im_filepath.rindex('.') 
+            seg_filepath = os.path.join(output_dir, d[im_filepath[i1+1:i2]] + '.png') 
             scipy.misc.toimage(seg, cmin=0, cmax=255).save(seg_filepath) 
 
         _t['misc'].tic()
