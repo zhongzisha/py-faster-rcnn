@@ -55,6 +55,8 @@ def parse_args():
                         help='a mapfile to be used to test', default=None)
     parser.add_argument('--output_dir', type=str, dest='output_dir', 
                         help='the output dir for saving results', default=None)
+    parser.add_argument('--num_classes', dest='num_classes', help='number of classes',
+                        default=0, type=int)
 
     if len(sys.argv) == 1:
         parser.print_help()
