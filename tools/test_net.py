@@ -10,7 +10,7 @@
 """Test a Fast R-CNN network on an image database."""
 
 import _init_paths
-from fast_rcnn.test import test_net
+from fast_rcnn.test import test_net, test_net_with_seg
 from fast_rcnn.config import cfg, cfg_from_file, cfg_from_list
 from datasets.factory import get_imdb
 import caffe
@@ -49,6 +49,9 @@ def parse_args():
     parser.add_argument('--num_dets', dest='max_per_image',
                         help='max number of detections per image',
                         default=100, type=int)
+    parser.add_argument('--image_list', type=str, dest='image_list', default=None)
+    parser.add_argument('--mapfile', type=str, dest='mapfile', default=None)
+    parser.add_argument('--output_dir', type=str, dest='output_dir', default=None)
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -87,4 +90,7 @@ if __name__ == '__main__':
     if not cfg.TEST.HAS_RPN:
         imdb.set_proposal_method(cfg.TEST.PROPOSAL_METHOD)
 
-    test_net(net, imdb, max_per_image=args.max_per_image, vis=args.vis)
+    if args.image_list is None:
+        test_net(net, imdb, max_per_image=args.max_per_image, vis=args.vis)
+    else:
+        test_net_with_seg(net, args.image_list, args.mapfile, args.num_classes, args.output_dir)
