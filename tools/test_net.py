@@ -49,6 +49,8 @@ def parse_args():
     parser.add_argument('--num_dets', dest='max_per_image',
                         help='max number of detections per image',
                         default=100, type=int)
+    parser.add_argument('--image_root', type=str, dest='image_root',
+                        help='image_root, e.g., /media/slave1temp/data/VOCdevkit2012/VOC2012', default=None)
     parser.add_argument('--image_list', type=str, dest='image_list', 
                         help='a given image list to test', default=None)
     parser.add_argument('--mapfile', type=str, dest='mapfile',
@@ -97,4 +99,4 @@ if __name__ == '__main__':
             imdb.set_proposal_method(cfg.TEST.PROPOSAL_METHOD)
         test_net(net, imdb, max_per_image=args.max_per_image, vis=args.vis)
     else:
-        test_net_with_seg(net, args.image_list, args.mapfile, args.num_classes, args.output_dir)
+        test_net_with_seg(net, args.image_root, args.image_list, args.mapfile, args.num_classes, args.output_dir)

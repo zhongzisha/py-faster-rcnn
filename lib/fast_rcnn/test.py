@@ -367,7 +367,7 @@ def test_net(net, imdb, max_per_image=100, thresh=0.05, vis=False):
     print 'Evaluating detections'
     imdb.evaluate_detections(all_boxes, output_dir)
     
-def test_net_with_seg(net, image_list, mapfile, num_classes, output_dir, max_per_image=100, thresh=0.05):
+def test_net_with_seg(net, image_root, image_list, mapfile, num_classes, output_dir, max_per_image=100, thresh=0.05):
     """Test a Fast R-CNN network on a given image list."""
     files = open(image_list, 'r').readlines()
     # read mapfile
@@ -391,7 +391,8 @@ def test_net_with_seg(net, image_list, mapfile, num_classes, output_dir, max_per
         # filter out any ground truth boxes 
         box_proposals = None 
 
-        im_filepath = files[i].split(' ')[0] 
+        im_filepath = image_root + files[i].split(' ')[0] 
+        print im_filepath
         im = cv2.imread(im_filepath)
         dsm = None
         if cfg.TEST.HAS_DSM == True: 
