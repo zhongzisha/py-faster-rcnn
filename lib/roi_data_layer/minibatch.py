@@ -165,7 +165,8 @@ def _get_image_blob(roidb, scale_inds):
     im_scales = []
     for i in xrange(num_images):
         im_name = roidb[i]['image']
-        print im_name
+        if cfg.DEBUG == True:
+            print im_name
         im = cv2.imread(im_name)
         dsm = None
         if cfg.TRAIN.HAS_DSM == True:
