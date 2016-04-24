@@ -397,8 +397,8 @@ layer {
   bottom: "pool51_mask"
   upsample_param {
     scale: 2
-    upsample_w: 38 #32
-    upsample_h: 38 #32
+    upsample_w: 32
+    upsample_h: 32
   }
 }
 layer {
@@ -503,8 +503,8 @@ layer {
   bottom: "pool4_mask"
   upsample_param {
     scale: 2
-    upsample_w: 75 #63
-    upsample_h: 75 #63
+    upsample_w: 63
+    upsample_h: 63
   }
 }
 layer {
@@ -608,8 +608,8 @@ layer {
   bottom: "pool3_mask"
   upsample_param {
     scale: 2    
-    upsample_w: 150 #125
-    upsample_h: 150 #125
+    upsample_w: 125
+    upsample_h: 125
   }
 }
 layer {
