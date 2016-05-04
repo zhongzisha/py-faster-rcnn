@@ -27,14 +27,7 @@ class pascal_voc(imdb):
         self._devkit_path = self._get_default_path() if devkit_path is None \
                             else devkit_path
         self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)
-        if int(self._year) == 2013:
-            self._classes = ('__background__', # always index 0
-                             # 'impervoussurfaces',
-                             # 'building',
-                             # 'lowvegetation',
-                             # 'tree',
-                             'car')
-        elif int(self._year) == 2014:
+        if int(self._year) == 2013 or int(self._year) == 2014 or int(self._year) == 2015:
             self._classes = ('__background__', # always index 0
                              # 'impervoussurfaces',
                              # 'building',
