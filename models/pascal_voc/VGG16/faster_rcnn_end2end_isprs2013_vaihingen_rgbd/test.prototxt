@@ -8,6 +8,14 @@ input_shape {
   dim: 224
 }
 
+input: "dsm"
+input_shape {
+  dim: 1
+  dim: 1
+  dim: 224
+  dim: 224
+}
+
 input: "im_info"
 input_shape {
   dim: 1

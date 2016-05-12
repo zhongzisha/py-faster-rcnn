@@ -845,7 +845,7 @@ layer {
 }
 layer {
   name: "loss"
-  type: "SoftmaxWithLoss"
+  type: "WeightedSoftmaxWithLoss"
   bottom: "conv1_1_D"
   bottom: "seg"
   top: "loss"
