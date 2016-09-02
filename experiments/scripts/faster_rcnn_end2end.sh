@@ -28,6 +28,18 @@ case $DATASET in
     TEST_IMDB="voc_2007_test"
     PT_DIR="pascal_voc"
     ITERS=70000
+    ;;  
+  vaihingen)
+    TRAIN_IMDB="voc_2013_train"
+    TEST_IMDB="voc_2013_val"
+    PT_DIR="vaihingen"
+    ITERS=70000
+    ;;
+  potsdam)
+    TRAIN_IMDB="voc_2014_train"
+    TEST_IMDB="voc_2014_val"
+    PT_DIR="potsdam"
+    ITERS=70000
     ;;
   coco)
     # This is a very long and slow training schedule
