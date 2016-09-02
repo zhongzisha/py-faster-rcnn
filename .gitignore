@@ -6,3 +6,4 @@ lib/pycocotools/_mask.so
 caffe-fast-rcnn/
 output/
 run*.sh
+backup/

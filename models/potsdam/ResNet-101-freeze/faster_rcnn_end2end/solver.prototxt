@@ -1,4 +1,4 @@
-train_net: "models/pascal_voc/ResNet-101-freeze/faster_rcnn_end2end/train.prototxt"
+train_net: "models/potsdam/ResNet-101-freeze/faster_rcnn_end2end/train.prototxt"
 base_lr: 0.001
 lr_policy: "step"
 gamma: 0.1
