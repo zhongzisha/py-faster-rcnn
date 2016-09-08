@@ -41,6 +41,18 @@ case $DATASET in
     PT_DIR="potsdam"
     ITERS=70000
     ;;
+  vaihingen_d) # with dsm information
+    TRAIN_IMDB="voc_2013_train"
+    TEST_IMDB="voc_2013_val"
+    PT_DIR="vaihingen_d"
+    ITERS=70000
+    ;;
+  potsdam_d) # with dsm information
+    TRAIN_IMDB="voc_2014_train"
+    TEST_IMDB="voc_2014_val"
+    PT_DIR="potsdam_d"
+    ITERS=70000
+    ;;
   coco)
     # This is a very long and slow training schedule
     # You can probably use fewer iterations and reduce the
