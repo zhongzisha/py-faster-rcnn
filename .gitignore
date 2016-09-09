@@ -7,3 +7,6 @@ caffe-fast-rcnn/
 output/
 run*.sh
 backup/
+*.txt
+*.pkl
+*.png
