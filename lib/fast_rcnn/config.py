@@ -288,6 +288,8 @@ def cfg_from_list(cfg_list):
         assert d.has_key(subkey)
         try:
             value = literal_eval(v)
+            if isinstance(d[subkey], np.ndarray):
+                value = np.array(value)
         except:
             # handle the case when v is a string literal
             value = v
