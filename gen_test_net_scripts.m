@@ -1,6 +1,6 @@
 function gen_test_net_scripts
 
-islocalserver = 0;
+islocalserver = 1;
 
 if 1
     DATASET='Vaihingen';
