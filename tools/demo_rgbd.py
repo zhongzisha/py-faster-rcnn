@@ -81,6 +81,8 @@ def parse_args():
                         default=None, type=str)
     parser.add_argument('--dsm_filepath', dest='dsm_filepath', help='path of dsm_filepath',
                         default=None, type=str)
+    parser.add_argument('--save_prefix', dest='save_prefix', help='save_prefix',
+                        default=None, type=str)
     parser.add_argument('--cfg', dest='cfg_file',
                         help='optional config file', default=None, type=str)
     parser.add_argument('--set', dest='set_cfgs',
@@ -174,9 +176,6 @@ if __name__ == '__main__':
     for i in inds:
         bbox = dets[i, :4]
         score = dets[i, -1]
-        cv2.rectangle(rgb0, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0))
-    if cfg.TEST.HAS_DSM == True:
-        save_filepath = rgb_filepath[rgb_filepath.rfind('/')+1:rgb_filepath.rfind('.')] + '_box_d.jpg'
-    else:
-        save_filepath = rgb_filepath[rgb_filepath.rfind('/')+1:rgb_filepath.rfind('.')] + '_box.jpg'
+        cv2.rectangle(rgb0, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0)) 
+    save_filepath = rgb_filepath[rgb_filepath.rfind('/')+1:rgb_filepath.rfind('.')] + '_' + args.save_prefix + '_box.jpg' 
     cv2.imwrite(save_filepath, rgb0)

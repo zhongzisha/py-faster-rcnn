@@ -41,7 +41,7 @@ if islocalserver
     f = fopen(sprintf('test_net_on_%s_RGB_ZF.sh', DATASET), 'w');
     for i = 1:length(vallist)
         prefix = vallist{i};
-        fprintf(f, 'python tools/demo_rgbd.py --gpu 0 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --set PIXEL_MEANS ''[[[84,86,117]]]''\n',...
+        fprintf(f, 'python tools/demo_rgbd.py --gpu 0 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGB_ZF --set PIXEL_MEANS ''[[[84,86,117]]]''\n',...
             prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
     end
     fclose(f);
@@ -52,7 +52,7 @@ if islocalserver
     f = fopen(sprintf('test_net_on_%s_RGBD_ZF.sh', DATASET), 'w');
     for i = 1:length(vallist)
         prefix = vallist{i};
-        fprintf(f, 'python tools/demo_rgbd.py --gpu 0 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --set TEST.HAS_DSM True PIXEL_MEANS ''[[[84,86,117]]]'' DSM_MEANS ''[32]''\n',...
+        fprintf(f, 'python tools/demo_rgbd.py --gpu 0 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGBD_ZF --set TEST.HAS_DSM True PIXEL_MEANS ''[[[84,86,117]]]'' DSM_MEANS ''[32]''\n',...
             prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
     end
     fclose(f);
@@ -65,7 +65,7 @@ else
     f = fopen(sprintf('test_net_on_%s_RGBD_ZF2.sh', DATASET), 'w');
     for i = 1:length(vallist)
         prefix = vallist{i};
-        fprintf(f, 'python tools/demo_rgbd.py --gpu 0 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --set TEST.HAS_DSM True PIXEL_MEANS ''[[[84,86,117]]]'' DSM_MEANS ''[32]''\n',...
+        fprintf(f, 'python tools/demo_rgbd.py --gpu 1 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGBD_ZF2 --set TEST.HAS_DSM True PIXEL_MEANS ''[[[84,86,117]]]'' DSM_MEANS ''[32]''\n',...
             prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
     end
     fclose(f);
@@ -76,7 +76,7 @@ else
     f = fopen(sprintf('test_net_on_%s_RGB_VGG16.sh', DATASET), 'w');
     for i = 1:length(vallist)
         prefix = vallist{i};
-        fprintf(f, 'python tools/demo_rgbd.py --gpu 0 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --set PIXEL_MEANS ''[[[84,86,117]]]''\n',...
+        fprintf(f, 'python tools/demo_rgbd.py --gpu 2 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGB_VGG16 --set PIXEL_MEANS ''[[[84,86,117]]]''\n',...
             prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
     end
     fclose(f);
@@ -87,7 +87,7 @@ else
     f = fopen(sprintf('test_net_on_%s_RGBD_VGG161.sh', DATASET), 'w');
     for i = 1:length(vallist)
         prefix = vallist{i};
-        fprintf(f, 'python tools/demo_rgbd.py --gpu 0 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --set TEST.HAS_DSM True PIXEL_MEANS ''[[[84,86,117]]]'' DSM_MEANS ''[32]''\n',...
+        fprintf(f, 'python tools/demo_rgbd.py --gpu 3 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGBD_VGG161 --set TEST.HAS_DSM True PIXEL_MEANS ''[[[84,86,117]]]'' DSM_MEANS ''[32]''\n',...
             prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
     end
     fclose(f);
