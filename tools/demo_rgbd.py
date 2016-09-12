@@ -170,15 +170,19 @@ if __name__ == '__main__':
     cls_dets = cls_dets[keep, :]
     print cls_dets.shape
     
+    det_file = os.path.join('detections.pkl')
+    with open(det_file, 'wb') as f:
+        cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+    
     # vis_detections(rgb0, 'car', cls_dets)
     inds = np.where(cls_dets[:, -1] >= 0.5)[0]
     if len(inds) == 0:
-        exit()
-        
-    import cv2
+        exit() 
     for i in inds:
         bbox = cls_dets[i, :4]
         score = cls_dets[i, -1]
         cv2.rectangle(rgb0, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0)) 
     save_filepath = rgb_filepath[rgb_filepath.rfind('/')+1:rgb_filepath.rfind('.')] + '_' + args.save_prefix + '_box.jpg' 
     cv2.imwrite(save_filepath, rgb0)
+    
+    
