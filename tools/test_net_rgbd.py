@@ -170,8 +170,26 @@ if __name__ == '__main__':
         dsm0 = None
         if cfg.TEST.HAS_DSM == True:  
             dsm0 = cv2.imread(dsm_image_path, cv2.IMREAD_GRAYSCALE) 
-        all_boxes[i] = test_on_one_image(net, rgb0, dsm0, args.nms_threshold)
-        print "{} has {} dections.".format(index, all_boxes[i].shape[0])
+        dets = test_on_one_image(net, rgb0, dsm0, args.nms_threshold)
+        all_boxes[i] = dets
+        print "{} has {} dections.".format(index, dets.shape[0])
+        
+        # vis_detections(rgb0, 'car', cls_dets)
+        inds = np.where(dets[:, -1] >= 0.5)[0]
+        if len(inds) == 0:
+            continue
+        for j in inds:
+            bbox = dets[j, :4]
+            score = dets[j, -1]
+            cv2.rectangle(rgb0, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0)) 
+        filename = args.save_prefix + '_det_' + args.image_set + '_' + index + '.jpg'
+        save_filepath = os.path.join(args.devkit_path,
+                                 'results',
+                                 'VOC' + args.year,
+                                 'Main',
+                                 filename)  
+        cv2.imwrite(save_filepath, rgb0)
+        
        
     filename = args.save_prefix + '_det_' + args.image_set + 'car.txt'
     save_path = os.path.join(args.devkit_path,
