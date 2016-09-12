@@ -92,7 +92,8 @@ def parse_args():
 def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3):
     BLOCK_SIZE = 500
     STEP_SIZE = 250
-
+    thresh = 0.05
+    
     height = rgb0.shape[0]
     width  = rgb0.shape[1]
     
@@ -107,18 +108,20 @@ def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3):
                 dsm = dsm0[y:y+BLOCK_SIZE, x:x+BLOCK_SIZE]
             # begin detection in a 500x500 image
             scores, boxes, seg = im_detect(net, im, dsm)
-            cls_scores = scores[:, j]
-            cls_boxes = boxes[:, j*4:(j+1)*4]
-            cls_boxes[:, 0] += x
-            cls_boxes[:, 1] += y
-            cls_boxes[:, 2] += x
-            cls_boxes[:, 3] += y
+            inds = np.where(scores[:, j] > thresh)[0]
+            cls_scores = scores[inds, j]
+            cls_boxes = boxes[inds, j*4:(j+1)*4]
             cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
-                .astype(np.float32, copy=False) 
+                .astype(np.float32, copy=False)
+            keep = nms(cls_dets, cfg.TEST.NMS)
+            cls_dets = cls_dets[keep, :] 
+            cls_dets[:, 0] += x
+            cls_dets[:, 1] += y
+            cls_dets[:, 2] += x
+            cls_dets[:, 3] += y 
             dets = np.vstack((dets, cls_dets))  
             
     
-    thresh = 0.05
     j = 1
     inds = np.where(dets[:, 4] > thresh)[0]
     dets = dets[inds, :] 
