@@ -166,12 +166,12 @@ if __name__ == '__main__':
     cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
         .astype(np.float32, copy=False)
     print cls_dets.shape
-    keep = nms(cls_dets, cfg.TEST.NMS)
+    keep = nms(cls_dets, args.nms_threshold)
     cls_dets = cls_dets[keep, :]
     print cls_dets.shape
     
     # vis_detections(rgb0, 'car', cls_dets)
-    inds = np.where(dets[:, -1] >= 0.5)[0]
+    inds = np.where(cls_dets[:, -1] >= 0.5)[0]
     if len(inds) == 0:
         exit()
         
