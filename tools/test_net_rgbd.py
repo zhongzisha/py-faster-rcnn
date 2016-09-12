@@ -68,7 +68,7 @@ def parse_args():
     parser.add_argument('--devkit_path', dest='devkit_path', help='path of devkit_path',
                         default=None, type=str)
     parser.add_argument('--year', dest='year', help='year',
-                        default=None, type=int)
+                        default=None, type=str)
     parser.add_argument('--image_set', dest='image_set', help='image_set (train, val, test)',
                         default=None, type=str)
     parser.add_argument('--save_prefix', dest='save_prefix', help='save_prefix',
