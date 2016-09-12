@@ -7,8 +7,18 @@ python tools/test_net_rgbd.py --gpu 3 \
 --year 2015 \
 --image_set val \
 --save_prefix vgg16 \
---nms_threshold 0.7
+--nms_threshold 0.3 \
+--set PIXEL_MEANS '[[[88,94,87]]]'
 
+python tools/test_net_rgbd.py --gpu 3 \
+--prototxt models/potsdam_d/VGG16/faster_rcnn_end2end/test.prototxt \
+--caffemodel output/faster_rcnn_end2end/voc_2014_train/d_vgg16_faster_rcnn_iter_70000.caffemodel \
+--devkit_path /home/nlpr2/data/VOCdevkit2015 \
+--year 2015 \
+--image_set val \
+--save_prefix d_vgg16 \
+--nms_threshold 0.3 \
+--set PIXEL_MEANS '[[[88,94,87]]]'
 '''
 import _init_paths
 from fast_rcnn.config import cfg, cfg_from_file, cfg_from_list
@@ -97,8 +107,8 @@ def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3):
     height = rgb0.shape[0]
     width  = rgb0.shape[1]
     
-    dets = np.zeros((0, 5), dtype=np.float32)
     j = 1
+    dets = np.zeros((0, 5), dtype=np.float32)
     dsm = None
     for y in xrange(0, height, STEP_SIZE):
         for x in xrange(0, width, STEP_SIZE):

@@ -1,4 +1,4 @@
-function gen_voc_no_random_step(save_root, year)
+function gen_voc_no_random_step(dataset_name, save_root, year)
 
 % here, we use random sampling for training 
 
@@ -21,7 +21,7 @@ mkdir ImageSets_Seg
 % cmap = voc_colormap(256);
 cmap = [0,0,0;1,1,1;0,0,1;0,1,1;0,1,0;1,1,0;1,0,0];
 
-if 0
+if strcmp(dataset_name, 'vaihingen')
     DATASET='Vaihingen';
     ROOT='/media/slave1data/rs/isprs2013/Vaihingen/ISPRS_semantic_labeling_Vaihingen';
     RGB_DIR=[ROOT, '/top'];
@@ -31,7 +31,7 @@ if 0
     trnlist={'1' '3' '5' '7' '13' '17' '21' '23' '26' '32' '37'};
     vallist={'11' '15' '28' '30' '34'};
     tstlist={'2' '4' '6' '8' '10' '12' '14' '16' '20' '22' '24' '27' '29' '31' '33' '35' '38'};
-else
+elseif strcmp(dataset_name, 'potsdam')
     DATASET='Potsdam';
     ROOT='/media/slave1data/rs/isprs2013/Potsdam/';
     RGB_DIR=[ROOT, '/2_Ortho_RGB'];
