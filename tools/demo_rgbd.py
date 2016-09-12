@@ -166,7 +166,7 @@ if __name__ == '__main__':
     cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
         .astype(np.float32, copy=False)
     print cls_dets.shape
-    keep = nms(cls_dets, args.nms_threshold)
+    keep = nms(cls_dets, cfg.TEST.NMS)
     cls_dets = cls_dets[keep, :]
     print cls_dets.shape
     
@@ -177,8 +177,8 @@ if __name__ == '__main__':
         
     import cv2
     for i in inds:
-        bbox = dets[i, :4]
-        score = dets[i, -1]
+        bbox = cls_dets[i, :4]
+        score = cls_dets[i, -1]
         cv2.rectangle(rgb0, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0)) 
     save_filepath = rgb_filepath[rgb_filepath.rfind('/')+1:rgb_filepath.rfind('.')] + '_' + args.save_prefix + '_box.jpg' 
     cv2.imwrite(save_filepath, rgb0)

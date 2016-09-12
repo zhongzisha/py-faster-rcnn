@@ -178,8 +178,8 @@ if __name__ == '__main__':
         
     import cv2
     for i in inds:
-        bbox = dets[i, :4]
-        score = dets[i, -1]
+        bbox = cls_dets[i, :4]
+        score = cls_dets[i, -1]
         cv2.rectangle(rgb0, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0)) 
     save_filepath = rgb_filepath[rgb_filepath.rfind('/')+1:rgb_filepath.rfind('.')] + '_' + args.save_prefix + '_box.jpg' 
     cv2.imwrite(save_filepath, rgb0)
