@@ -171,7 +171,7 @@ if __name__ == '__main__':
         if cfg.TEST.HAS_DSM == True:  
             dsm0 = cv2.imread(dsm_image_path, cv2.IMREAD_GRAYSCALE) 
         all_boxes[i] = test_on_one_image(net, rgb0, dsm0, args.nms_threshold)
-        print "{} has {} dections.".format(index, dets.shape[0])
+        print "{} has {} dections.".format(index, all_boxes[i].shape[0])
        
     filename = args.save_prefix + '_det_' + args.image_set + 'car.txt'
     save_path = os.path.join(args.devkit_path,
