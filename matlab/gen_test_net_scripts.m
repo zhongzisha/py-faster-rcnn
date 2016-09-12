@@ -1,8 +1,8 @@
 function gen_test_net_scripts
 
-islocalserver = 1;
+islocalserver = 0;
 
-if 1
+if 0
     DATASET='Vaihingen';
     if islocalserver
         ROOT='/media/slave1data/rs/isprs2013/Vaihingen/ISPRS_semantic_labeling_Vaihingen';
@@ -59,38 +59,44 @@ if islocalserver
     
 else
     
-    %% for RGBD ZF2
-    prototxt = 'models/potsdam_d/ZF2/faster_rcnn_end2end/test.prototxt';
-    caffemodel = 'output/faster_rcnn_end2end_update_means/voc_2014_train/d_zf2_faster_rcnn_iter_70000.caffemodel';
-    f = fopen(sprintf('test_net_on_%s_RGBD_ZF2.sh', DATASET), 'w');
-    for i = 1:length(vallist)
-        prefix = vallist{i};
-        fprintf(f, 'python tools/demo_rgbd.py --gpu 1 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGBD_ZF2 --set TEST.HAS_DSM True PIXEL_MEANS ''[[[84,86,117]]]'' DSM_MEANS ''[32]''\n',...
-            prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
+    if 0
+        %% for RGBD ZF2
+        prototxt = 'models/potsdam_d/ZF2/faster_rcnn_end2end/test.prototxt';
+        caffemodel = 'output/faster_rcnn_end2end_update_means/voc_2014_train/d_zf2_faster_rcnn_iter_70000.caffemodel';
+        f = fopen(sprintf('test_net_on_%s_RGBD_ZF2.sh', DATASET), 'w');
+        for i = 1:length(vallist)
+            prefix = vallist{i};
+            fprintf(f, 'python tools/demo_rgbd.py --gpu 1 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGBD_ZF2 --set TEST.HAS_DSM True PIXEL_MEANS ''[[[84,86,117]]]'' DSM_MEANS ''[32]''\n',...
+                prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
+        end
+        fclose(f);
     end
-    fclose(f);
     
-    %% for RGB VGG16
-    prototxt = 'models/potsdam/VGG16/faster_rcnn_end2end/test.prototxt';
-    caffemodel = 'output/faster_rcnn_end2end_update_means/voc_2014_train/vgg16_faster_rcnn_iter_70000.caffemodel';
-    f = fopen(sprintf('test_net_on_%s_RGB_VGG16.sh', DATASET), 'w');
-    for i = 1:length(vallist)
-        prefix = vallist{i};
-        fprintf(f, 'python tools/demo_rgbd.py --gpu 2 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGB_VGG16 --set PIXEL_MEANS ''[[[84,86,117]]]''\n',...
-            prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
+    if 1
+        %% for RGB VGG16
+        prototxt = 'models/potsdam/VGG16/faster_rcnn_end2end/test.prototxt';
+        caffemodel = 'output/faster_rcnn_end2end_update_means/voc_2014_train/vgg16_faster_rcnn_iter_70000.caffemodel';
+        f = fopen(sprintf('test_net_on_%s_RGB_VGG16.sh', DATASET), 'w');
+        for i = 1:length(vallist)
+            prefix = vallist{i};
+            fprintf(f, 'python tools/demo_rgbd.py --gpu 2 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGB_VGG16 --nms_threshold 0.7 --set PIXEL_MEANS ''[[[88,94,87]]]''\n',...
+                prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
+        end
+        fclose(f);
     end
-    fclose(f);
     
-    %% for RGBD VGG16
-    prototxt = 'models/potsdam_d/VGG161/faster_rcnn_end2end/test.prototxt';
-    caffemodel = 'output/faster_rcnn_end2end_update_means/voc_2014_train/d_vgg161_faster_rcnn_iter_70000.caffemodel';
-    f = fopen(sprintf('test_net_on_%s_RGBD_VGG161.sh', DATASET), 'w');
-    for i = 1:length(vallist)
-        prefix = vallist{i};
-        fprintf(f, 'python tools/demo_rgbd.py --gpu 3 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGBD_VGG161 --set TEST.HAS_DSM True PIXEL_MEANS ''[[[84,86,117]]]'' DSM_MEANS ''[32]''\n',...
-            prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
+    if 0
+        %% for RGBD VGG16
+        prototxt = 'models/potsdam_d/VGG161/faster_rcnn_end2end/test.prototxt';
+        caffemodel = 'output/faster_rcnn_end2end_update_means/voc_2014_train/d_vgg161_faster_rcnn_iter_70000.caffemodel';
+        f = fopen(sprintf('test_net_on_%s_RGBD_VGG161.sh', DATASET), 'w');
+        for i = 1:length(vallist)
+            prefix = vallist{i};
+            fprintf(f, 'python tools/demo_rgbd.py --gpu 3 --prototxt %s --caffemodel %s --rgb_filepath %s/%s%s.png --dsm_filepath %s/%s%s.png --save_prefix RGBD_VGG161 --set TEST.HAS_DSM True PIXEL_MEANS ''[[[84,86,117]]]'' DSM_MEANS ''[32]''\n',...
+                prototxt, caffemodel, RGB_DIR, PREFIX, prefix, DSM_DIR, PREFIX, prefix);
+        end
+        fclose(f);
     end
-    fclose(f);
 end
 
 end

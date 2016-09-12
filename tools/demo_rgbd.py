@@ -83,6 +83,8 @@ def parse_args():
                         default=None, type=str)
     parser.add_argument('--save_prefix', dest='save_prefix', help='save_prefix',
                         default=None, type=str)
+    parser.add_argument('--nms_threshold', dest='nms_threshold', help='nms_threshold',
+                        default=None, type=float)
     parser.add_argument('--cfg', dest='cfg_file',
                         help='optional config file', default=None, type=str)
     parser.add_argument('--set', dest='set_cfgs',
@@ -163,10 +165,11 @@ if __name__ == '__main__':
     cls_boxes = dets[:, 0:4]
     cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
         .astype(np.float32, copy=False)
-    keep = nms(cls_dets, cfg.TEST.NMS)
-    cls_dets = cls_dets[keep, :]
-
     print cls_dets.shape
+    keep = nms(cls_dets, args.nms_threhold)
+    cls_dets = cls_dets[keep, :]
+    print cls_dets.shape
+    
     # vis_detections(rgb0, 'car', cls_dets)
     inds = np.where(dets[:, -1] >= 0.5)[0]
     if len(inds) == 0:
