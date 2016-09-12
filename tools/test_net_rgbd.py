@@ -162,7 +162,7 @@ if __name__ == '__main__':
     num_images = len(image_index)
     all_boxes = [[] for _ in xrange(num_images)]
     
-    for i in xrange(image_index):
+    for i in xrange(num_images):
         index = image_index[i]
         rgb_image_path = os.path.join(data_path, 'JPEGImages', index + '.jpg')
         dsm_image_path = os.path.join(data_path, 'JPEGImages', index + '_depth.jpg')
@@ -181,9 +181,10 @@ if __name__ == '__main__':
                         filename)
      
     with open(save_path, 'wt') as f: 
-        for i in xrange(image_index):
+        for i in xrange(num_images):
+            index = image_index[i]
             dets = all_boxes[i]
-            for k in xrange(all_dets.shape[0]):
+            for k in xrange(dets.shape[0]):
                 f.write('{:s} {:.3f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.
                         format(index, dets[k, -1],
                                dets[k, 0] + 1, dets[k, 1] + 1,
