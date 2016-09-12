@@ -75,7 +75,7 @@ else
     if 1
         %% for RGB VGG16
         prototxt = 'models/potsdam/VGG16/faster_rcnn_end2end/test.prototxt';
-        caffemodel = 'output/faster_rcnn_end2end_update_means/voc_2014_train/vgg16_faster_rcnn_iter_70000.caffemodel';
+        caffemodel = 'output/faster_rcnn_end2end/voc_2014_train/vgg16_faster_rcnn_iter_70000.caffemodel';
         f = fopen(sprintf('test_net_on_%s_RGB_VGG16.sh', DATASET), 'w');
         for i = 1:length(vallist)
             prefix = vallist{i};

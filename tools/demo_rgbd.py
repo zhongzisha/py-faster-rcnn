@@ -166,7 +166,7 @@ if __name__ == '__main__':
     cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
         .astype(np.float32, copy=False)
     print cls_dets.shape
-    keep = nms(cls_dets, args.nms_threhold)
+    keep = nms(cls_dets, args.nms_threshold)
     cls_dets = cls_dets[keep, :]
     print cls_dets.shape
     
