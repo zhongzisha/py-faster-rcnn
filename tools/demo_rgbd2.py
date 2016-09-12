@@ -147,10 +147,12 @@ if __name__ == '__main__':
             cls_boxes = boxes[inds, j*4:(j+1)*4]
             cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
                 .astype(np.float32, copy=False) 
-            cls_boxes[:, 0] += x
-            cls_boxes[:, 1] += y
-            cls_boxes[:, 2] += x
-            cls_boxes[:, 3] += y
+            keep = nms(cls_dets, cfg.TEST.NMS)
+            cls_dets = cls_dets[keep, :]
+            cls_dets[:, 0] += x
+            cls_dets[:, 1] += y
+            cls_dets[:, 2] += x
+            cls_dets[:, 3] += y
             dets = np.vstack((dets, cls_dets))
             print "{}, {}".format(y, x)
     
