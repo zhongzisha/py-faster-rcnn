@@ -1,4 +1,10 @@
 '''
+To generate MATLAB result:
+export PATH=/usr/local/MATLAB/R2015b/bin:$PATH
+python ./tools/reval.py --imdb voc_2014_val --matlab --comp \
+    ./output/faster_rcnn_end2end/voc_2014_val/vgg16_faster_rcnn_iter_70000/
+    
+    
 Usage:
 python tools/test_net_rgbd.py --gpu 3 \
 --prototxt models/potsdam/VGG16/faster_rcnn_end2end/test.prototxt \

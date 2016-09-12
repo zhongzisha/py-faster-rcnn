@@ -11,3 +11,6 @@ backup/
 *.pkl
 *.png
 *.jpg
+.project
+.pydevproject
+
