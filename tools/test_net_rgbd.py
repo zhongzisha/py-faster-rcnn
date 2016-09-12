@@ -1,12 +1,12 @@
 '''
 Usage:
 python tools/test_net_rgbd.py --gpu 3 \
---prototxt models/potsdam_d/ZF/faster_rcnn_end2end/test.prototxt \
---caffemodel output/faster_rcnn_end2end/voc_2014_train/d_zf_faster_rcnn_iter_70000.caffemodel \
+--prototxt models/potsdam/VGG16/faster_rcnn_end2end/test.prototxt \
+--caffemodel output/faster_rcnn_end2end/voc_2014_train/vgg16_faster_rcnn_iter_70000.caffemodel \
 --devkit_path /home/nlpr2/data/VOCdevkit2015 \
 --year 2015 \
 --image_set val \
---save_prefix zf \
+--save_prefix vgg16 \
 --nms_threshold 0.7
 
 '''
@@ -67,7 +67,7 @@ def parse_args():
                         default=None, type=str)
     parser.add_argument('--devkit_path', dest='devkit_path', help='path of devkit_path',
                         default=None, type=str)
-    parser.add_argument('--year', dest='year', help='year', help='which year (2015, 2016)',
+    parser.add_argument('--year', dest='year', help='year',
                         default=None, type=int)
     parser.add_argument('--image_set', dest='image_set', help='image_set (train, val, test)',
                         default=None, type=str)
