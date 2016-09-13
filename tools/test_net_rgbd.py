@@ -6,25 +6,25 @@ python ./tools/reval.py --imdb voc_2014_val --matlab --comp \
     
     
 Usage:
-python tools/test_net_rgbd.py --gpu 3 \
---prototxt models/potsdam/VGG16/faster_rcnn_end2end/test.prototxt \
---caffemodel output/faster_rcnn_end2end/voc_2014_train/vgg16_faster_rcnn_iter_70000.caffemodel \
---devkit_path /home/nlpr2/data/VOCdevkit2015 \
---year 2015 \
+python tools/test_net_rgbd.py --gpu 2 \
+--prototxt models/vaihingen/VGG16/faster_rcnn_end2end/test.prototxt \
+--caffemodel output/faster_rcnn_end2end/voc_2013_train/vgg16_faster_rcnn_iter_70000.caffemodel \
+--devkit_path /home/nlpr2/data/VOCdevkit2013 \
+--year 2013 \
 --image_set val \
 --save_prefix vgg16 \
 --nms_threshold 0.3 \
---set PIXEL_MEANS '[[[88,94,87]]]'
+--set PIXEL_MEANS '[[[84,86,117]]]'
 
 python tools/test_net_rgbd.py --gpu 3 \
 --prototxt models/potsdam_d/VGG16/faster_rcnn_end2end/test.prototxt \
 --caffemodel output/faster_rcnn_end2end/voc_2014_train/d_vgg16_faster_rcnn_iter_70000.caffemodel \
---devkit_path /home/nlpr2/data/VOCdevkit2015 \
---year 2015 \
+--devkit_path /home/nlpr2/data/VOCdevkit2014_for_test \
+--year 2014 \
 --image_set val \
 --save_prefix d_vgg16 \
 --nms_threshold 0.3 \
---set PIXEL_MEANS '[[[88,94,87]]]'
+--set PIXEL_MEANS '[[[88,94,87]]]' DSM_MEANS '[42]' TEST.HAS_DSM True
 '''
 import _init_paths
 from fast_rcnn.config import cfg, cfg_from_file, cfg_from_list
