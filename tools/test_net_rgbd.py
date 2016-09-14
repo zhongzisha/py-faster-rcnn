@@ -118,7 +118,7 @@ def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3, num_seg_classes=6
     dsm = None
     seg_result = None
     if cfg.TEST.HAS_SEG == True:
-        seg_result = np.zeros((height, width, num_seg_classes),dtype=np.float32)
+        seg_result = np.zeros((num_seg_classes, height, width),dtype=np.float32)
     for y in xrange(0, height, STEP_SIZE):
         for x in xrange(0, width, STEP_SIZE):
             # yield the current window
@@ -137,11 +137,11 @@ def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3, num_seg_classes=6
                 .astype(np.float32, copy=False) 
             dets = np.vstack((dets, cls_dets))
             if seg_ is not None:
-                seg_result[y:y+BLOCK_SIZE, x:x+BLOCK_SIZE, :] = seg_ 
+                seg_result[:, y:y+BLOCK_SIZE, x:x+BLOCK_SIZE] = seg_ 
             
     
     if cfg.TEST.HAS_SEG == True:
-        seg_result = seg_result[0:height, 0:width, :]
+        seg_result = seg_result[:, 0:height, 0:width]
     j = 1
     inds = np.where(dets[:, 4] > thresh)[0]
     dets = dets[inds, :] 
