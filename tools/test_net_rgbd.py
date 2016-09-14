@@ -107,7 +107,7 @@ def parse_args():
 
 def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3, num_seg_classes=6):
     BLOCK_SIZE = 500
-    STEP_SIZE = 250
+    STEP_SIZE = 500
     thresh = 0.05
     
     height = rgb0.shape[0]
