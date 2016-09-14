@@ -33,7 +33,8 @@ from fast_rcnn.nms_wrapper import nms
 from utils.timer import Timer
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.io as sio
+import scipy
+import scipy.io
 import caffe, os, sys, cv2
 import argparse
 
