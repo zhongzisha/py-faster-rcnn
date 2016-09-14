@@ -105,7 +105,7 @@ def parse_args():
 
     return args
 
-def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3):
+def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3, num_seg_classes=6):
     BLOCK_SIZE = 500
     STEP_SIZE = 250
     thresh = 0.05
@@ -116,6 +116,9 @@ def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3):
     j = 1
     dets = np.zeros((0, 5), dtype=np.float32)
     dsm = None
+    seg_result = None
+    if cfg.TEST.HAS_SEG == True:
+        seg_result = np.zeros((height, width, num_seg_classes),dtype=np.float32)
     for y in xrange(0, height, STEP_SIZE):
         for x in xrange(0, width, STEP_SIZE):
             # yield the current window
@@ -123,7 +126,7 @@ def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3):
             if dsm0 is not None:
                 dsm = dsm0[y:y+BLOCK_SIZE, x:x+BLOCK_SIZE]
             # begin detection in a 500x500 image
-            scores, boxes, seg = im_detect(net, im, dsm)
+            scores, boxes, seg_ = im_detect(net, im, dsm)
             cls_scores = scores[:, j]
             cls_boxes = boxes[:, j*4:(j+1)*4]
             cls_boxes[:, 0] += x
@@ -133,8 +136,12 @@ def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3):
             cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
                 .astype(np.float32, copy=False) 
             dets = np.vstack((dets, cls_dets))
+            if seg_ is not None:
+                seg_result[y:y+BLOCK_SIZE, x:x+BLOCK_SIZE, :] = seg_ 
             
     
+    if cfg.TEST.HAS_SEG == True:
+        seg_result = seg_result[0:height, 0:width, :]
     j = 1
     inds = np.where(dets[:, 4] > thresh)[0]
     dets = dets[inds, :] 
@@ -144,11 +151,11 @@ def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3):
     dets = dets[inds, :] 
     cls_scores = dets[:, -1]
     cls_boxes = dets[:, 0:4]
-    cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
+    det_result = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
         .astype(np.float32, copy=False) 
-    keep = nms(cls_dets, nms_threshold)
-    cls_dets = cls_dets[keep, :]
-    return cls_dets
+    keep = nms(det_result, nms_threshold)
+    det_result = det_result[keep, :]
+    return det_result, seg_result
 
 if __name__ == '__main__':
 
@@ -186,17 +193,17 @@ if __name__ == '__main__':
         dsm0 = None
         if cfg.TEST.HAS_DSM == True:  
             dsm0 = cv2.imread(dsm_image_path, cv2.IMREAD_GRAYSCALE) 
-        dets = test_on_one_image(net, rgb0, dsm0, args.nms_threshold)
-        all_boxes[i] = dets
-        print "{} has {} dections.".format(index, dets.shape[0])
+        det_result, seg_result = test_on_one_image(net, rgb0, dsm0, args.nms_threshold)
+        all_boxes[i] = det_result
+        print "{} has {} dections.".format(index, det_result.shape[0])
         
         # vis_detections(rgb0, 'car', cls_dets)
-        inds = np.where(dets[:, -1] >= 0.5)[0]
+        inds = np.where(det_result[:, -1] >= 0.5)[0]
         if len(inds) == 0:
             continue
         for j in inds:
-            bbox = dets[j, :4]
-            score = dets[j, -1]
+            bbox = det_result[j, :4]
+            score = det_result[j, -1]
             cv2.rectangle(rgb0, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0)) 
         filename = args.save_prefix + '_det_' + args.image_set + '_' + index + '.jpg'
         save_filepath = os.path.join(args.devkit_path,
@@ -205,6 +212,14 @@ if __name__ == '__main__':
                                  'Main',
                                  filename)  
         cv2.imwrite(save_filepath, rgb0)
+        if seg_result is not None:
+            filename = args.save_prefix + '_det_' + args.image_set + '_' + index + '.mat'
+            save_filepath = os.path.join(args.devkit_path,
+                                         'results',
+                                         'VOC' + args.year,
+                                         'Main',
+                                         filename) 
+            scipy.io.savemat(save_filepath, {'seg_prob': seg_result})
         
        
     filename = args.save_prefix + '_det_' + args.image_set + '_car.txt'

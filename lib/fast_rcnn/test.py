@@ -237,13 +237,11 @@ def im_detect(net, im, dsm=None, boxes=None):
         scores = scores[inv_index, :]
         pred_boxes = pred_boxes[inv_index, :]
 
-    pred_seg = None
+    seg_prob = None
     if cfg.TEST.HAS_SEG:
         seg_prob = net.blobs['seg_prob'].data
-        seg_output = np.squeeze(seg_prob[0,:,:,:])
-        pred_seg = np.argmax(seg_output, axis=0)
 
-    return scores, pred_boxes, pred_seg
+    return scores, pred_boxes, seg_prob
 
 def vis_detections(im, class_name, dets, thresh=0.3):
     """Visual debugging of detections."""
@@ -411,14 +409,16 @@ def test_net_with_seg(net, image_root, image_list, mapfile,
             dsm_name = im_filepath[:-4]+'_depth.jpg'
             dsm = cv2.imread(dsm_name, cv2.IMREAD_GRAYSCALE)
         _t['im_detect'].tic() 
-        scores, boxes, seg = im_detect(net, im, dsm, box_proposals)  
+        scores, boxes, seg_prob = im_detect(net, im, dsm, box_proposals)  
         _t['im_detect'].toc()
         
-        if seg is not None:
+        if seg_prob is not None:
             i1 = im_filepath.rindex('/')
             i2 = im_filepath.rindex('.') 
             seg_filepath = os.path.join(output_dir, d[im_filepath[i1+1:i2]] + '.png') 
-            scipy.misc.toimage(seg, cmin=0, cmax=255).save(seg_filepath) 
+            seg_output = np.squeeze(seg_prob[0,:,:,:])  
+            pred_seg = np.argmax(seg_output, axis=0)    
+            scipy.misc.toimage(pred_seg, cmin=0, cmax=255).save(seg_filepath) 
 
         _t['misc'].tic()
         # skip j = 0, because it's the background class
