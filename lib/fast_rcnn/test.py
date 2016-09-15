@@ -370,7 +370,7 @@ def test_net(net, imdb, max_per_image=100, thresh=0.05, vis=False):
         if seg_prob is not None:
             i1 = im_filepath.rindex('/')
             i2 = im_filepath.rindex('.') 
-            seg_filepath = os.path.join(output_dir, d[im_filepath[i1+1:i2]] + '.png') 
+            seg_filepath = os.path.join(output_dir, im_filepath[i1+1:i2] + '.png') 
             seg_output = np.squeeze(seg_prob[0,:,:,:])  
             pred_seg = np.argmax(seg_output, axis=0)    
             scipy.misc.toimage(pred_seg, cmin=0, cmax=255).save(seg_filepath) 
