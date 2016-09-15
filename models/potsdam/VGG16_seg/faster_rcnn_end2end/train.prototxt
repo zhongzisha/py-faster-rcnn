@@ -850,14 +850,15 @@ layer {
   bottom: "seg"
   top: "loss"
   loss_param: {
+    normalize: true 
     weight_by_label_freqs: true
     ignore_label: 5
-    class_weighting: 0.71781
-    class_weighting: 0.79834
-    class_weighting: 1.0618
-    class_weighting: 0.94497
-    class_weighting: 13.435
-    class_weighting: 1.9899
+    class_weighting: 0.38398
+    class_weighting: 0.55237
+    class_weighting: 0.97983
+    class_weighting: 1.021
+    class_weighting: 4.4118
+    class_weighting: 4.0394
   }
 }
 layer {
