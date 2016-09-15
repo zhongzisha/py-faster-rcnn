@@ -209,33 +209,36 @@ def im_detect(net, im, dsm=None, boxes=None):
         forward_kwargs['rois'] = blobs['rois'].astype(np.float32, copy=False)
     blobs_out = net.forward(**forward_kwargs)
 
-    if cfg.TEST.HAS_RPN:
-        assert len(im_scales) == 1, "Only single-image batch implemented"
-        rois = net.blobs['rois'].data.copy()
-        # unscale back to raw image space
-        boxes = rois[:, 1:5] / im_scales[0]
-
-    if cfg.TEST.SVM:
-        # use the raw scores before softmax under the assumption they
-        # were trained as linear SVMs
-        scores = net.blobs['cls_score'].data
-    else:
-        # use softmax estimated probabilities
-        scores = blobs_out['cls_prob']
-
-    if cfg.TEST.BBOX_REG:
-        # Apply bounding-box regression deltas
-        box_deltas = blobs_out['bbox_pred']
-        pred_boxes = bbox_transform_inv(boxes, box_deltas)
-        pred_boxes = clip_boxes(pred_boxes, im.shape)
-    else:
-        # Simply repeat the boxes, once for each class
-        pred_boxes = np.tile(boxes, (1, scores.shape[1]))
-
-    if cfg.DEDUP_BOXES > 0 and not cfg.TEST.HAS_RPN:
-        # Map scores and predictions back to the original set of boxes
-        scores = scores[inv_index, :]
-        pred_boxes = pred_boxes[inv_index, :]
+    scores = []
+    pred_boxes = []
+    if cfg.TEST.HAS_DET == True:
+        if cfg.TEST.HAS_RPN:
+            assert len(im_scales) == 1, "Only single-image batch implemented"
+            rois = net.blobs['rois'].data.copy()
+            # unscale back to raw image space
+            boxes = rois[:, 1:5] / im_scales[0]
+    
+        if cfg.TEST.SVM:
+            # use the raw scores before softmax under the assumption they
+            # were trained as linear SVMs
+            scores = net.blobs['cls_score'].data
+        else:
+            # use softmax estimated probabilities
+            scores = blobs_out['cls_prob']
+    
+        if cfg.TEST.BBOX_REG:
+            # Apply bounding-box regression deltas
+            box_deltas = blobs_out['bbox_pred']
+            pred_boxes = bbox_transform_inv(boxes, box_deltas)
+            pred_boxes = clip_boxes(pred_boxes, im.shape)
+        else:
+            # Simply repeat the boxes, once for each class
+            pred_boxes = np.tile(boxes, (1, scores.shape[1]))
+    
+        if cfg.DEDUP_BOXES > 0 and not cfg.TEST.HAS_RPN:
+            # Map scores and predictions back to the original set of boxes
+            scores = scores[inv_index, :]
+            pred_boxes = pred_boxes[inv_index, :]
 
     seg_prob = None
     if cfg.TEST.HAS_SEG:
@@ -408,10 +411,39 @@ def test_net_with_seg(net, image_root, image_list, mapfile,
         if cfg.TEST.HAS_DSM == True: 
             dsm_name = im_filepath[:-4]+'_depth.jpg'
             dsm = cv2.imread(dsm_name, cv2.IMREAD_GRAYSCALE)
+        
         _t['im_detect'].tic() 
         scores, boxes, seg_prob = im_detect(net, im, dsm, box_proposals)  
         _t['im_detect'].toc()
+    
+        if cfg.TEST.HAS_DET == True:
+            _t['misc'].tic()
+            # skip j = 0, because it's the background class
+            for j in xrange(1, num_classes):
+                inds = np.where(scores[:, j] > thresh)[0]
+                cls_scores = scores[inds, j]
+                cls_boxes = boxes[inds, j*4:(j+1)*4]
+                cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
+                    .astype(np.float32, copy=False)
+                keep = nms(cls_dets, cfg.TEST.NMS)
+                cls_dets = cls_dets[keep, :] 
+                all_boxes[j][i] = cls_dets
         
+            # Limit to max_per_image detections *over all classes*
+            if max_per_image > 0:
+                image_scores = np.hstack([all_boxes[j][i][:, -1]
+                                          for j in xrange(1, num_classes)])
+                if len(image_scores) > max_per_image:
+                    image_thresh = np.sort(image_scores)[-max_per_image]
+                    for j in xrange(1, imdb.num_classes):
+                        keep = np.where(all_boxes[j][i][:, -1] >= image_thresh)[0]
+                        all_boxes[j][i] = all_boxes[j][i][keep, :]
+            _t['misc'].toc()
+        
+            print 'im_detect: {:d}/{:d} {:.3f}s {:.3f}s' \
+                  .format(i + 1, num_images, _t['im_detect'].average_time,
+                          _t['misc'].average_time)
+              
         if seg_prob is not None:
             i1 = im_filepath.rindex('/')
             i2 = im_filepath.rindex('.') 
@@ -420,33 +452,8 @@ def test_net_with_seg(net, image_root, image_list, mapfile,
             pred_seg = np.argmax(seg_output, axis=0)    
             scipy.misc.toimage(pred_seg, cmin=0, cmax=255).save(seg_filepath) 
 
-        _t['misc'].tic()
-        # skip j = 0, because it's the background class
-        for j in xrange(1, num_classes):
-            inds = np.where(scores[:, j] > thresh)[0]
-            cls_scores = scores[inds, j]
-            cls_boxes = boxes[inds, j*4:(j+1)*4]
-            cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
-                .astype(np.float32, copy=False)
-            keep = nms(cls_dets, cfg.TEST.NMS)
-            cls_dets = cls_dets[keep, :] 
-            all_boxes[j][i] = cls_dets
 
-        # Limit to max_per_image detections *over all classes*
-        if max_per_image > 0:
-            image_scores = np.hstack([all_boxes[j][i][:, -1]
-                                      for j in xrange(1, num_classes)])
-            if len(image_scores) > max_per_image:
-                image_thresh = np.sort(image_scores)[-max_per_image]
-                for j in xrange(1, imdb.num_classes):
-                    keep = np.where(all_boxes[j][i][:, -1] >= image_thresh)[0]
-                    all_boxes[j][i] = all_boxes[j][i][keep, :]
-        _t['misc'].toc()
-
-        print 'im_detect: {:d}/{:d} {:.3f}s {:.3f}s' \
-              .format(i + 1, num_images, _t['im_detect'].average_time,
-                      _t['misc'].average_time)
-
-    det_file = os.path.join(output_dir, os.path.basename(image_list)[:-4] + '_detections.pkl')
-    with open(det_file, 'wb') as f:
-        cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
+    if cfg.TEST.HAS_DET == True:
+        det_file = os.path.join(output_dir, os.path.basename(image_list)[:-4] + '_detections.pkl')
+        with open(det_file, 'wb') as f:
+            cPickle.dump(all_boxes, f, cPickle.HIGHEST_PROTOCOL)
