@@ -15,18 +15,18 @@ layer {
 }
 
 #layer {
-#  name: "salience_dsm"
-#  type: "Salience"
+#  name: "silence_dsm"
+#  type: "Silence"
 #  bottom: "dsm"
 #}
 layer {
-  name: "salience_im_info"
-  type: "Salience"
+  name: "silence_im_info"
+  type: "Silence"
   bottom: "im_info"
 }
 layer {
-  name: "salience_gt_boxes"
-  type: "Salience"
+  name: "silence_gt_boxes"
+  type: "Silence"
   bottom: "gt_boxes"
 }
 
