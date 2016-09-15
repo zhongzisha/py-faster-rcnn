@@ -14,11 +14,11 @@ layer {
   }
 }
 
-layer {
-  name: "salience_dsm"
-  type: "Salience"
-  bottom: "dsm"
-}
+#layer {
+#  name: "salience_dsm"
+#  type: "Salience"
+#  bottom: "dsm"
+#}
 layer {
   name: "salience_im_info"
   type: "Salience"
