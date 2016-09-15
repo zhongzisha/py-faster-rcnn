@@ -90,6 +90,10 @@ def parse_args():
                         default=None, type=str)
     parser.add_argument('--save_prefix', dest='save_prefix', help='save_prefix',
                         default=None, type=str)
+    parser.add_argument('--step_size', dest='step_size', help='step_size',
+                        default=250, type=int)
+    parser.add_argument('--conf_threshold', dest='conf_threshold', help='conf_threshold',
+                        default=0.6, type=float)
     parser.add_argument('--nms_threshold', dest='nms_threshold', help='nms_threshold',
                         default=0.3, type=float)
     parser.add_argument('--cfg', dest='cfg_file',
@@ -106,10 +110,8 @@ def parse_args():
 
     return args
 
-def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3, num_seg_classes=6):
-    BLOCK_SIZE = 500
-    STEP_SIZE = 500
-    thresh = 0.05
+def test_on_one_image(net, rgb0, dsm0=None, step_size=250, conf_threshold=0.6, nms_threshold=0.3, num_seg_classes=6):
+    BLOCK_SIZE = 500  
     
     height = rgb0.shape[0]
     width  = rgb0.shape[1]
@@ -120,8 +122,8 @@ def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3, num_seg_classes=6
     seg_result = None
     if cfg.TEST.HAS_SEG == True:
         seg_result = np.zeros((num_seg_classes, height, width),dtype=np.float32)
-    for y in xrange(0, height, STEP_SIZE):
-        for x in xrange(0, width, STEP_SIZE):
+    for y in xrange(0, height, step_size):
+        for x in xrange(0, width, step_size):
             # yield the current window
             im = rgb0[y:y+BLOCK_SIZE, x:x+BLOCK_SIZE, :]
             if dsm0 is not None:
@@ -144,7 +146,7 @@ def test_on_one_image(net, rgb0, dsm0=None, nms_threshold=0.3, num_seg_classes=6
     if cfg.TEST.HAS_SEG == True:
         seg_result = seg_result[:, 0:height, 0:width]
     j = 1
-    inds = np.where(dets[:, 4] > thresh)[0]
+    inds = np.where(dets[:, 4] > conf_threshold)[0]
     dets = dets[inds, :] 
     inds = np.where(dets[:, 2] <= width)[0]
     dets = dets[inds, :] 
@@ -194,12 +196,12 @@ if __name__ == '__main__':
         dsm0 = None
         if cfg.TEST.HAS_DSM == True:  
             dsm0 = cv2.imread(dsm_image_path, cv2.IMREAD_GRAYSCALE) 
-        det_result, seg_result = test_on_one_image(net, rgb0, dsm0, args.nms_threshold)
+        det_result, seg_result = test_on_one_image(net, rgb0, dsm0, args.step_size, args.conf_threshold, args.nms_threshold)
         all_boxes[i] = det_result
         print "{} has {} dections.".format(index, det_result.shape[0])
         
         # vis_detections(rgb0, 'car', cls_dets)
-        inds = np.where(det_result[:, -1] >= 0.5)[0]
+        inds = np.where(det_result[:, -1] >= args.conf_threshold)[0]
         if len(inds) == 0:
             continue
         for j in inds:
