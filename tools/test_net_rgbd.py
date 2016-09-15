@@ -130,34 +130,39 @@ def test_on_one_image(net, rgb0, dsm0=None, step_size=250, conf_threshold=0.6, n
                 dsm = dsm0[y:y+BLOCK_SIZE, x:x+BLOCK_SIZE]
             # begin detection in a 500x500 image
             scores, boxes, seg_ = im_detect(net, im, dsm)
-            cls_scores = scores[:, j]
-            cls_boxes = boxes[:, j*4:(j+1)*4]
-            cls_boxes[:, 0] += x
-            cls_boxes[:, 1] += y
-            cls_boxes[:, 2] += x
-            cls_boxes[:, 3] += y
-            cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
-                .astype(np.float32, copy=False) 
-            dets = np.vstack((dets, cls_dets))
+            if cfg.TEST.HAS_DET == True:
+                cls_scores = scores[:, j]
+                cls_boxes = boxes[:, j*4:(j+1)*4]
+                cls_boxes[:, 0] += x
+                cls_boxes[:, 1] += y
+                cls_boxes[:, 2] += x
+                cls_boxes[:, 3] += y
+                cls_dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
+                    .astype(np.float32, copy=False) 
+                dets = np.vstack((dets, cls_dets))
             if seg_ is not None:
                 seg_result[:, y:y+BLOCK_SIZE, x:x+BLOCK_SIZE] = seg_ 
             
     
     if cfg.TEST.HAS_SEG == True:
         seg_result = seg_result[:, 0:height, 0:width]
-    j = 1
-    inds = np.where(dets[:, 4] > conf_threshold)[0]
-    dets = dets[inds, :] 
-    inds = np.where(dets[:, 2] <= width)[0]
-    dets = dets[inds, :] 
-    inds = np.where(dets[:, 3] <= height)[0]
-    dets = dets[inds, :] 
-    cls_scores = dets[:, -1]
-    cls_boxes = dets[:, 0:4]
-    det_result = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
-        .astype(np.float32, copy=False) 
-    keep = nms(det_result, nms_threshold)
-    det_result = det_result[keep, :]
+    
+    det_result = None
+    if cfg.TEST.HAS_DET == True:
+        j = 1
+        inds = np.where(dets[:, 4] > conf_threshold)[0]
+        dets = dets[inds, :] 
+        inds = np.where(dets[:, 2] <= width)[0]
+        dets = dets[inds, :] 
+        inds = np.where(dets[:, 3] <= height)[0]
+        dets = dets[inds, :] 
+        cls_scores = dets[:, -1]
+        cls_boxes = dets[:, 0:4]
+        det_result = np.hstack((cls_boxes, cls_scores[:, np.newaxis])) \
+            .astype(np.float32, copy=False) 
+        keep = nms(det_result, nms_threshold)
+        det_result = det_result[keep, :]
+        
     return det_result, seg_result
 
 if __name__ == '__main__':
@@ -197,24 +202,27 @@ if __name__ == '__main__':
         if cfg.TEST.HAS_DSM == True:  
             dsm0 = cv2.imread(dsm_image_path, cv2.IMREAD_GRAYSCALE) 
         det_result, seg_result = test_on_one_image(net, rgb0, dsm0, args.step_size, args.conf_threshold, args.nms_threshold)
-        all_boxes[i] = det_result
-        print "{} has {} dections.".format(index, det_result.shape[0])
         
-        # vis_detections(rgb0, 'car', cls_dets)
-        inds = np.where(det_result[:, -1] >= args.conf_threshold)[0]
-        if len(inds) == 0:
-            continue
-        for j in inds:
-            bbox = det_result[j, :4]
-            score = det_result[j, -1]
-            cv2.rectangle(rgb0, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0)) 
-        filename = args.save_prefix + '_det_' + args.image_set + '_' + index + '.jpg'
-        save_filepath = os.path.join(args.devkit_path,
-                                 'results',
-                                 'VOC' + args.year,
-                                 'Main',
-                                 filename)  
-        cv2.imwrite(save_filepath, rgb0)
+        if cfg.TEST.HAS_DET == True:
+            all_boxes[i] = det_result
+            print "{} has {} dections.".format(index, det_result.shape[0])
+            
+            # vis_detections(rgb0, 'car', cls_dets)
+            inds = np.where(det_result[:, -1] >= args.conf_threshold)[0]
+            if len(inds) == 0:
+                continue
+            for j in inds:
+                bbox = det_result[j, :4]
+                score = det_result[j, -1]
+                cv2.rectangle(rgb0, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0)) 
+            filename = args.save_prefix + '_det_' + args.image_set + '_' + index + '.jpg'
+            save_filepath = os.path.join(args.devkit_path,
+                                     'results',
+                                     'VOC' + args.year,
+                                     'Main',
+                                     filename)  
+            cv2.imwrite(save_filepath, rgb0)
+            
         if seg_result is not None:
             filename = args.save_prefix + '_det_' + args.image_set + '_' + index + '.mat'
             save_filepath = os.path.join(args.devkit_path,
@@ -224,21 +232,21 @@ if __name__ == '__main__':
                                          filename) 
             scipy.io.savemat(save_filepath, {'seg_prob': seg_result})
         
-       
-    filename = args.save_prefix + '_det_' + args.image_set + '_car.txt'
-    save_path = os.path.join(args.devkit_path,
-                        'results',
-                        'VOC' + args.year,
-                        'Main',
-                        filename)
-     
-    with open(save_path, 'wt') as f: 
-        for i in xrange(num_images):
-            index = image_index[i]
-            dets = all_boxes[i]
-            for k in xrange(dets.shape[0]):
-                f.write('{:s} {:.3f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.
-                        format(index, dets[k, -1],
-                               dets[k, 0] + 1, dets[k, 1] + 1,
-                               dets[k, 2] + 1, dets[k, 3] + 1))
+    
+    if cfg.TEST.HAS_DET == True:
+        filename = args.save_prefix + '_det_' + args.image_set + '_car.txt'
+        save_path = os.path.join(args.devkit_path,
+                            'results',
+                            'VOC' + args.year,
+                            'Main',
+                            filename) 
+        with open(save_path, 'wt') as f: 
+            for i in xrange(num_images):
+                index = image_index[i]
+                dets = all_boxes[i]
+                for k in xrange(dets.shape[0]):
+                    f.write('{:s} {:.3f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.
+                            format(index, dets[k, -1],
+                                   dets[k, 0] + 1, dets[k, 1] + 1,
+                                   dets[k, 2] + 1, dets[k, 3] + 1))
     
