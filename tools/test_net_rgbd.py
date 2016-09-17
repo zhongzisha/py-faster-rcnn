@@ -112,9 +112,18 @@ def parse_args():
 
 def test_on_one_image(net, rgb0, dsm0=None, step_size=250, conf_threshold=0.6, nms_threshold=0.3, num_seg_classes=6):
     BLOCK_SIZE = 500  
-    
-    height = rgb0.shape[0]
-    width  = rgb0.shape[1]
+        
+    height, width, num_bands = rgb0.shape
+    if height % BLOCK_SIZE:
+        height_padsize = BLOCK_SIZE - height % BLOCK_SIZE
+    if width % BLOCK_SIZE:
+        width_padsize = BLOCK_SIZE - width % BLOCK_SIZE
+    rgb0 = np.pad(rgb0, ((0, height_padsize),(0, width_padsize),(0, 0)), 'reflect')
+    if dsm0 is not None:
+        if len(dsm0.shape) == 2:
+            dsm0 = np.pad(dsm0, ((0, height_padsize),(0, width_padsize)), 'reflect')
+        else:
+            dsm0 = np.pad(dsm0, ((0, 0), (0, height_padsize),(0, width_padsize)), 'reflect') 
     
     j = 1
     dets = np.zeros((0, 5), dtype=np.float32)
