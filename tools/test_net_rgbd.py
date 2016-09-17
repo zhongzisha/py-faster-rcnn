@@ -130,9 +130,9 @@ def test_on_one_image(net, rgb0, dsm0=None, step_size=250, conf_threshold=0.6, n
     dsm = None
     seg_result = None
     if cfg.TEST.HAS_SEG == True:
-        seg_result = np.zeros((num_seg_classes, height, width),dtype=np.float32)
-    for y in xrange(0, height, step_size):
-        for x in xrange(0, width, step_size):
+        seg_result = np.zeros((num_seg_classes, rgb0.shape[0], rgb0.shape[1]),dtype=np.float32)
+    for y in xrange(0, rgb0.shape[0], step_size):
+        for x in xrange(0, rgb0.shape[1], step_size):
             # yield the current window
             im = rgb0[y:y+BLOCK_SIZE, x:x+BLOCK_SIZE, :]
             if dsm0 is not None:
