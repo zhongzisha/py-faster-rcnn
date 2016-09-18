@@ -36,8 +36,8 @@ def make_testable(train_model_path):
     train_net.input.append("data")
     train_net.input_dim.append(1)
     train_net.input_dim.append(3)
-    train_net.input_dim.append(in_h)
-    train_net.input_dim.append(in_w)
+    train_net.input_dim.append(500)
+    train_net.input_dim.append(500)
         
     return train_net
 
