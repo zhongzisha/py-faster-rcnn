@@ -1,12 +1,31 @@
-import sys
+#!/usr/bin/env python
 import os
 import numpy as np
 from skimage.io import ImageCollection
 from argparse import ArgumentParser
 
+
+
+
+caffe_root = '/SegNet/caffe-segnet/'             # Change this to the absolute directoy to SegNet Caffe
+import sys
+sys.path.insert(0, caffe_root + 'python')
+
 import caffe
 from caffe.proto import caffe_pb2
 from google.protobuf import text_format
+
+
+def extract_dataset(net_message):
+    assert net_message.layer[0].type == "DenseImageData"
+    source = net_message.layer[0].dense_image_data_param.source
+    with open(source) as f:
+        data = f.read().split()
+    ims = ImageCollection(data[::2])
+    labs = ImageCollection(data[1::2])
+    assert len(ims) == len(labs) > 0
+    return ims, labs
+
 
 def make_testable(train_model_path):
     # load the train net prototxt as a protobuf message
@@ -21,38 +40,12 @@ def make_testable(train_model_path):
             layer.top.append(layer.top[0] + "-mean")
             layer.top.append(layer.top[0] + "-var")
 
-    print(train_net.layer[0].name)
-    print(train_net.layer[1].name)
-
     # remove the test data layer if present
     if train_net.layer[1].name == "data" and train_net.layer[1].include:
         train_net.layer.remove(train_net.layer[1])
         if train_net.layer[0].include:
             # remove the 'include {phase: TRAIN}' layer param
             train_net.layer[0].include.remove(train_net.layer[0].include[0])
-    if train_net.layer[0].name == "input-data":
-        train_net.layer.remove(train_net.layer[0])
-            
-    train_net.input.append("data")
-    train_net.input_dim.append(1)
-    train_net.input_dim.append(3)
-    train_net.input_dim.append(500)
-    train_net.input_dim.append(500)
-    
-    train_net.input.append("seg")
-    train_net.input_dim.append(1)
-    train_net.input_dim.append(1)
-    train_net.input_dim.append(500)
-    train_net.input_dim.append(500)
-
-    train_net.input.append("im_info")
-    train_net.input_dim.append(1)
-    train_net.input_dim.append(3)
-    
-    train_net.input.append("gt_boxes")
-    train_net.input_dim.append(1)
-    train_net.input_dim.append(5)
-        
     return train_net
 
 
@@ -153,30 +146,23 @@ def make_test_files(testable_net_path, train_weights_path, num_iterations,
     for dead in dead_outputs:
         test_msg.layer.remove(dead)
     test_msg.layer.add(
-        name="seg_prob", type="Softmax", bottom=[out_bottom], top=['seg_prob']
+        name="prob", type="Softmax", bottom=[out_bottom], top=['prob']
     )
     return net, test_msg
 
 
 def make_parser():
     p = ArgumentParser()
-    p.add_argument('--train_model', type=str, required=True)
-    p.add_argument('--weights', type=str, required=True)
-    p.add_argument('--out_dir', type=str, required=True)
-    p.add_argument('--device_id', type=int, required=True)
-    p.add_argument('--in_h', type=int, default=500)
-    p.add_argument('--in_w', type=int, default=500)
-    p.add_argument('--train_size', type=int, default=0)
-    p.add_argument('--minibatch_size', type=int, default=1)
+    p.add_argument('train_model')
+    p.add_argument('weights')
+    p.add_argument('out_dir')
     return p
 
 
 if __name__ == '__main__':
+    caffe.set_mode_gpu()
     p = make_parser()
     args = p.parse_args()
-
-    caffe.set_mode_gpu()
-    caffe.set_device(args.device_id)
 
     # build and save testable net
     if not os.path.exists(args.out_dir):
@@ -191,11 +177,11 @@ if __name__ == '__main__':
 
     # use testable net to calculate BN layer stats
     print "Calculate BN stats..."
-    # train_ims, train_labs = extract_dataset(testable_msg)
-    train_size = args.train_size # len(train_ims)
-    minibatch_size = args.minibatch_size # testable_msg.layer[0].dense_image_data_param.batch_size
+    train_ims, train_labs = extract_dataset(testable_msg)
+    train_size = len(train_ims)
+    minibatch_size = testable_msg.layer[0].dense_image_data_param.batch_size
     num_iterations = train_size // minibatch_size + train_size % minibatch_size
-    in_h, in_w =(args.in_h, args.in_w)
+    in_h, in_w =(360, 480)
     test_net, test_msg = make_test_files(BN_calc_path, args.weights, num_iterations,
                                          in_h, in_w)
     
@@ -208,4 +194,3 @@ if __name__ == '__main__':
     print "Saving test net weights..."
     test_net.save(os.path.join(args.out_dir, "test_weights.caffemodel"))
     print "done"
-
