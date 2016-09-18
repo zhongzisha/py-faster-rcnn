@@ -127,7 +127,7 @@ def make_test_files(testable_net_path, train_weights_path, num_iterations,
     for dead in dead_outputs:
         test_msg.layer.remove(dead)
     test_msg.layer.add(
-        name="prob", type="Softmax", bottom=[out_bottom], top=['prob']
+        name="seg_prob", type="Softmax", bottom=[out_bottom], top=['seg_prob']
     )
     return net, test_msg
 
@@ -141,6 +141,7 @@ def make_parser():
     p.add_argument('--in_h', type=int, default=500)
     p.add_argument('--in_w', type=int, default=500)
     p.add_argument('--train_size', type=int, default=0)
+    p.add_argument('--minibatch_size', type=int, default=1)
     return p
 
 
@@ -166,7 +167,7 @@ if __name__ == '__main__':
     print "Calculate BN stats..."
     # train_ims, train_labs = extract_dataset(testable_msg)
     train_size = args.train_size # len(train_ims)
-    minibatch_size = testable_msg.layer[0].dense_image_data_param.batch_size
+    minibatch_size = args.minibatch_size # testable_msg.layer[0].dense_image_data_param.batch_size
     num_iterations = train_size // minibatch_size + train_size % minibatch_size
     in_h, in_w =(args.in_h, args.in_w)
     test_net, test_msg = make_test_files(BN_calc_path, args.weights, num_iterations,
