@@ -21,12 +21,21 @@ def make_testable(train_model_path):
             layer.top.append(layer.top[0] + "-mean")
             layer.top.append(layer.top[0] + "-var")
 
+    print(train_net.layer[0].name)
+    print(train_net.layer[1].name)
+
     # remove the test data layer if present
-    if (train_net.layer[1].name == "data" or train_net.layer[1].name == "input-data") and train_net.layer[1].include:
+    if train_net.layer[1].name == "data" and train_net.layer[1].include:
         train_net.layer.remove(train_net.layer[1])
         if train_net.layer[0].include:
             # remove the 'include {phase: TRAIN}' layer param
             train_net.layer[0].include.remove(train_net.layer[0].include[0])
+    if train_net.layer[1].name == "input-data":
+        train_net.layer.remove(train_net.layer[1])
+        if train_net.layer[0].include:
+            # remove the 'include {phase: TRAIN}' layer param
+            train_net.layer[0].include.remove(train_net.layer[0].include[0])
+            
     return train_net
 
 
