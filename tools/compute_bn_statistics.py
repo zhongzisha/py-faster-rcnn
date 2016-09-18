@@ -1,11 +1,8 @@
-#!/usr/bin/env python
+import sys
 import os
 import numpy as np
 from skimage.io import ImageCollection
 from argparse import ArgumentParser
-
-import sys
-sys.path.insert(0, caffe_root + 'python')
 
 import caffe
 from caffe.proto import caffe_pb2
