@@ -30,11 +30,8 @@ def make_testable(train_model_path):
         if train_net.layer[0].include:
             # remove the 'include {phase: TRAIN}' layer param
             train_net.layer[0].include.remove(train_net.layer[0].include[0])
-    if train_net.layer[1].name == "input-data":
-        train_net.layer.remove(train_net.layer[1])
-        if train_net.layer[0].include:
-            # remove the 'include {phase: TRAIN}' layer param
-            train_net.layer[0].include.remove(train_net.layer[0].include[0])
+    if train_net.layer[0].name == "input-data":
+        train_net.layer.remove(train_net.layer[0])
             
     return train_net
 
