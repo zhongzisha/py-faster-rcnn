@@ -38,6 +38,20 @@ def make_testable(train_model_path):
     train_net.input_dim.append(3)
     train_net.input_dim.append(500)
     train_net.input_dim.append(500)
+    
+    train_net.input.append("seg")
+    train_net.input_dim.append(1)
+    train_net.input_dim.append(1)
+    train_net.input_dim.append(500)
+    train_net.input_dim.append(500)
+
+    train_net.input.append("im_info")
+    train_net.input_dim.append(1)
+    train_net.input_dim.append(3)
+    
+    train_net.input.append("gt_boxes")
+    train_net.input_dim.append(1)
+    train_net.input_dim.append(5)
         
     return train_net
 
