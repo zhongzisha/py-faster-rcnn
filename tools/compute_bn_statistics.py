@@ -33,6 +33,12 @@ def make_testable(train_model_path):
     if train_net.layer[0].name == "input-data":
         train_net.layer.remove(train_net.layer[0])
             
+    train_net.input.append("data")
+    train_net.input_dim.append(1)
+    train_net.input_dim.append(3)
+    train_net.input_dim.append(in_h)
+    train_net.input_dim.append(in_w)
+        
     return train_net
 
 
