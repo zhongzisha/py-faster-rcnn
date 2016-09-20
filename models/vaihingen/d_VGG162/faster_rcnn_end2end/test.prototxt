@@ -110,7 +110,7 @@ layer {
   name: "conv1_1_sum"
   type: "Eltwise"
   bottom: "conv1_1"
-  bottom: "covn1_1_dsm"
+  bottom: "conv1_1_dsm"
   top: "conv1_1_sum"
   eltwise_param {
     operation: SUM
@@ -147,7 +147,7 @@ layer {
   name: "conv1_2_sum"
   type: "Eltwise"
   bottom: "conv1_2"
-  bottom: "covn1_2_dsm"
+  bottom: "conv1_2_dsm"
   top: "conv1_2_sum"
   eltwise_param {
     operation: SUM
