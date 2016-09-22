@@ -1,5 +1,5 @@
 
-nets = {'zf','vgg16','d_zf','d_vgg16','d_zf1','d_vgg161','d_vgg162'};
+nets = {'zf','vgg16','d_zf','d_vgg16','d_zf1','d_vgg161','d_vgg162','d_vgg163'};
 colors = VOClabelcolormap(20); %rand(20,3);
 legend_strs = cell(1, length(nets));
 

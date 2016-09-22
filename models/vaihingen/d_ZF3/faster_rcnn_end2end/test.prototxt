@@ -402,7 +402,7 @@ layer {
 	name: "conv5_sum"
 	type: "Eltwise"
 	bottom: "conv5"
-	bottom: "conv4_dsm"
+	bottom: "conv5_dsm"
 	top: "conv5_sum"
 	eltwise_param { 
 		operation: SUM
