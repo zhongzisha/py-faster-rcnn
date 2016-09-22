@@ -365,10 +365,22 @@ layer {
 	bottom: "conv4"
 	top: "conv4"
 }
+#############################
+layer {
+	name: "conv4_sum"
+	type: "Eltwise"
+	bottom: "conv4"
+	bottom: "conv4_dsm"
+	top: "conv4_sum"
+	eltwise_param { 
+		operation: SUM
+	}
+}
+#############################
 layer {
 	name: "conv5"
 	type: "Convolution"
-	bottom: "conv4"
+	bottom: "conv4_sum"
 	top: "conv5"
 	param { lr_mult: 1.0 }
 	param { lr_mult: 2.0 }
@@ -385,14 +397,25 @@ layer {
 	bottom: "conv5"
 	top: "conv5"
 }
-
+#############################
+layer {
+	name: "conv5_sum"
+	type: "Eltwise"
+	bottom: "conv5"
+	bottom: "conv4_dsm"
+	top: "conv5_sum"
+	eltwise_param { 
+		operation: SUM
+	}
+}
+#############################
 
 #========= RPN ============
 
 layer {
   name: "rpn_conv/3x3"
   type: "Convolution"
-  bottom: "conv5"
+  bottom: "conv5_sum"
   top: "rpn/output"
   convolution_param {
     num_output: 256
@@ -410,7 +433,7 @@ layer {
 #layer {
 #  name: "rpn_conv/3x3"
 #  type: "Convolution"
-#  bottom: "conv5"
+#  bottom: "conv5_sum"
 #  top: "rpn_conv/3x3"
 #  param { lr_mult: 1.0 decay_mult: 1.0 }
 #  param { lr_mult: 2.0 decay_mult: 0 }
@@ -424,7 +447,7 @@ layer {
 #layer {
 #  name: "rpn_conv/5x5"
 #  type: "Convolution"
-#  bottom: "conv5"
+#  bottom: "conv5_sum"
 #  top: "rpn_conv/5x5"
 #  param { lr_mult: 1.0 decay_mult: 1.0 }
 #  param { lr_mult: 2.0 decay_mult: 0 }
@@ -514,7 +537,7 @@ layer {
 layer {
   name: "roi_pool_conv5"
   type: "ROIPooling"
-  bottom: "conv5"
+  bottom: "conv5_sum"
   bottom: "rois"
   top: "roi_pool_conv5"
   roi_pooling_param {

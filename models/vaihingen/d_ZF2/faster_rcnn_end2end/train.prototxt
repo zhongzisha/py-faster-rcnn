@@ -360,7 +360,7 @@ layer {
 layer {
 	name: "conv5"
 	type: "Convolution"
-	bottom: "conv4_sum"
+	bottom: "conv4"
 	top: "conv5"
 	param { lr_mult: 1.0 }
 	param { lr_mult: 2.0 }
