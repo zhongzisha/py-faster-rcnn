@@ -152,52 +152,6 @@ layer {
 	bottom: "conv3_dsm"
 	top: "conv3_dsm"
 }
-layer {
-	name: "conv4_dsm"
-	type: "Convolution"
-	bottom: "conv3_dsm"
-	top: "conv4_dsm"
-	param { lr_mult: 1.0 }
-	param { lr_mult: 2.0 }
-	convolution_param {
-		num_output: 384
-		kernel_size: 3
-		pad: 1
-		stride: 1
-
-    weight_filler { type: "gaussian" std: 0.01 }
-    bias_filler { type: "constant" value: 0 }
-	}
-}
-layer {
-	name: "relu4_dsm"
-	type: "ReLU"
-	bottom: "conv4_dsm"
-	top: "conv4_dsm"
-}
-layer {
-	name: "conv5_dsm"
-	type: "Convolution"
-	bottom: "conv4_dsm"
-	top: "conv5_dsm"
-	param { lr_mult: 1.0 }
-	param { lr_mult: 2.0 }
-	convolution_param {
-		num_output: 256
-		kernel_size: 3
-		pad: 1
-		stride: 1
-
-    weight_filler { type: "gaussian" std: 0.01 }
-    bias_filler { type: "constant" value: 0 }
-	}
-}
-layer {
-	name: "relu5_dsm"
-	type: "ReLU"
-	bottom: "conv5_dsm"
-	top: "conv5_dsm"
-}
 
 #========= conv1-conv5 ============
 
