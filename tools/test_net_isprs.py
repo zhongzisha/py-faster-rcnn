@@ -69,12 +69,10 @@ def parse_args():
 
 def get_seg_result(net, im, rgb_mean, dsm=None, dsm_mean=None):
     blobs = {'data' : None, 'dsm' : None}
-    print(im.shape)
-    print(len(rgb_mean))
-    print(type(rgb_mean))
     blobs['data'] = np.zeros((1, im.shape[0], im.shape[1], im.shape[2]), 
                             dtype=np.float32)
     blobs['data'][0,...] = im - rgb_mean 
+    print(blobs['data'].shape)
     net.blobs['data'].reshape(*(blobs['data'].shape))
     forward_kwargs = {'data': blobs['data'].astype(np.float32, copy=False)}
     if dsm != None:
