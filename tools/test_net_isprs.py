@@ -147,7 +147,7 @@ if __name__ == '__main__':
         dsm_image_path = os.path.join(data_path, 'JPEGImages', index + '_depth.jpg')
         rgb0 = cv2.imread(rgb_image_path)
         dsm0 = None
-        if cfg.TEST.HAS_DSM == True:  
+        if dsm_mean != None:  
             dsm0 = cv2.imread(dsm_image_path, cv2.IMREAD_GRAYSCALE) 
         seg_result = test_on_one_image(net, rgb0, rgb_mean, dsm0, dsm_mean, args.step_size)
         
