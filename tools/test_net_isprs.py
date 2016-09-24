@@ -69,6 +69,9 @@ def parse_args():
 
 def get_seg_result(net, im, rgb_mean, dsm=None, dsm_mean=None):
     blobs = {'data' : None, 'dsm' : None}
+    print(im.shape)
+    print(len(rgb_mean))
+    print(type(rgb_mean))
     blobs['data'] = np.zeros((1, im.shape[0], im.shape[1], im.shape[2]), 
                             dtype=np.float32)
     blobs['data'][0,...] = im - rgb_mean 
@@ -98,8 +101,6 @@ def test_on_one_image(net, rgb0, rgb_mean, dsm0=None, dsm_mean=None, step_size=2
         else:
             dsm0 = np.pad(dsm0, ((0, 0), (0, height_padsize),(0, width_padsize)), 'reflect') 
     
-    j = 1
-    dets = np.zeros((0, 5), dtype=np.float32)
     dsm = None
     seg_result = None
     seg_result = np.zeros((num_seg_classes, rgb0.shape[0], rgb0.shape[1]),dtype=np.float32)
@@ -111,6 +112,7 @@ def test_on_one_image(net, rgb0, rgb_mean, dsm0=None, dsm_mean=None, step_size=2
                 dsm = dsm0[y:y+BLOCK_SIZE, x:x+BLOCK_SIZE]
             # begin detection in a 500x500 image
             seg_ = get_seg_result(net, im, rgb_mean, dsm, dsm_mean)
+            
             if seg_ is not None:
                 seg_result[:, y:y+BLOCK_SIZE, x:x+BLOCK_SIZE] = seg_ 
                 
