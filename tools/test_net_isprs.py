@@ -87,6 +87,7 @@ def get_seg_result(net, im, rgb_mean, dsm=None, dsm_mean=None):
     blobs_out = net.forward(**forward_kwargs)
     
     seg_prob = net.blobs['prob'].data
+    return seg_prob
 
 def test_on_one_image(net, rgb0, rgb_mean, dsm0=None, dsm_mean=None, step_size=250, num_seg_classes=6):
     BLOCK_SIZE = 500  
