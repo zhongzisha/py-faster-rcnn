@@ -124,7 +124,9 @@ if __name__ == '__main__':
     caffe.set_device(args.gpu_id)
     
     rgb_mean = literal_eval(args.rgb_mean)
-    dsm_mean = literal_eval(args.dsm_mean)
+    dsm_mean = None
+    if args.dsm_mean != None:
+        dsm_mean = literal_eval(args.dsm_mean)
     
     # load net
     net = caffe.Net(args.prototxt, args.caffemodel, caffe.TEST)
