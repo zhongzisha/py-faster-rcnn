@@ -84,7 +84,7 @@ def get_seg_result(net, im, rgb_mean, dsm=None, dsm_mean=None):
         net.blobs['dsm'].reshape(*(blobs['dsm'].shape))
         forward_kwargs['dsm'] = blobs['dsm'].astype(np.float32, copy=False)
         
-    net.forward(**forward_kwargs)
+    blobs_out = net.forward(**forward_kwargs)
     
     seg_prob = net.blobs['prob'].data
 
