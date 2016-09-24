@@ -69,19 +69,23 @@ def parse_args():
 
 def get_seg_result(net, im, rgb_mean, dsm=None, dsm_mean=None):
     blobs = {'data' : None, 'dsm' : None}
-    blobs['data'] = np.zeros((1, im.shape[0], im.shape[1], im.shape[2]), 
+    data_blob = np.zeros((1, im.shape[0], im.shape[1], im.shape[2]), 
                             dtype=np.float32)
-    blobs['data'][0,...] = im - rgb_mean 
-    print(blobs['data'].shape)
+    data_blob[0,...] = im - rgb_mean  
+    channel_swap = (0, 3, 1, 2)
+    blobs['data'] = data_blob.transpose(channel_swap) 
     net.blobs['data'].reshape(*(blobs['data'].shape))
     forward_kwargs = {'data': blobs['data'].astype(np.float32, copy=False)}
     if dsm != None:
-        blobs['dsm'] = np.zeros((1, im.shape[0], im.shape[1], 1), 
+        dsm_blob = np.zeros((1, im.shape[0], im.shape[1], 1), 
                                 dtype=np.float32)
-        blobs['dsm'][0,...] = dsm - dsm_mean
+        dsm_blob[0,...] = dsm - dsm_mean 
+        blobs['dsm'] = dsm_blob.transpose(channel_swap)
         net.blobs['dsm'].reshape(*(blobs['dsm'].shape))
         forward_kwargs['dsm'] = blobs['dsm'].astype(np.float32, copy=False)
+        
     net.forward(**forward_kwargs)
+    
     seg_prob = net.blobs['prob'].data
 
 def test_on_one_image(net, rgb0, rgb_mean, dsm0=None, dsm_mean=None, step_size=250, num_seg_classes=6):
