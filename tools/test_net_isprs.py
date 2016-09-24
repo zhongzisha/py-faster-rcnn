@@ -76,7 +76,7 @@ def get_seg_result(net, im, rgb_mean, dsm=None, dsm_mean=None):
     blobs['data'] = data_blob.transpose(channel_swap) 
     net.blobs['data'].reshape(*(blobs['data'].shape))
     forward_kwargs = {'data': blobs['data'].astype(np.float32, copy=False)}
-    if dsm != None:
+    if dsm is not None:
         dsm_blob = np.zeros((1, im.shape[0], im.shape[1], 1), 
                                 dtype=np.float32)
         dsm_blob[0, :, :, 0] = dsm - dsm_mean 
