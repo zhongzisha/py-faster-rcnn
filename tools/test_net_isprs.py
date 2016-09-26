@@ -75,7 +75,7 @@ def get_seg_result(net, im, bgr_mean, dsm=None, dsm_mean=None, prob_blob_name='p
                             dtype=np.float32)
     data_blob[0, :, :, :] = im - bgr_mean  
     channel_swap = (0, 3, 1, 2)
-    blobs['data'] = data_blob.transpose(channel_swap) 
+    blobs['data'] = data_blob.transpose(channel_swap)  
     net.blobs['data'].reshape(*(blobs['data'].shape))
     forward_kwargs = {'data': blobs['data'].astype(np.float32, copy=False)}
     if dsm is not None:
@@ -152,7 +152,7 @@ if __name__ == '__main__':
         index = image_index[i]
         bgr_image_path = os.path.join(data_path, 'JPEGImages', index + '.jpg')
         dsm_image_path = os.path.join(data_path, 'JPEGImages', index + '_depth.jpg')
-        bgr0 = cv2.imread(bgr_image_path)
+        bgr0 = cv2.imread(bgr_image_path) #
         dsm0 = None
         if dsm_mean != None:  
             dsm0 = cv2.imread(dsm_image_path, cv2.IMREAD_GRAYSCALE) 
