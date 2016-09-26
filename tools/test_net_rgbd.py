@@ -114,6 +114,8 @@ def test_on_one_image(net, rgb0, dsm0=None, step_size=250, conf_threshold=0.6, n
     BLOCK_SIZE = 500  
         
     height, width, num_bands = rgb0.shape
+    height_padsize = 0
+    width_padsize = 0
     if height % BLOCK_SIZE:
         height_padsize = BLOCK_SIZE - height % BLOCK_SIZE
     if width % BLOCK_SIZE:
