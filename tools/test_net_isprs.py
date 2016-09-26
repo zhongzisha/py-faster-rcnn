@@ -58,6 +58,8 @@ def parse_args():
                         default=None, type=str)
     parser.add_argument('--dsm_mean', dest='dsm_mean', help='dsm_mean',
                         default=None, type=str)
+    parser.add_argument('--prob_blob_name', dest='prob_blob_name', help='prob_blob_name',
+                        default='prob', type=str)
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -67,7 +69,7 @@ def parse_args():
 
     return args
 
-def get_seg_result(net, im, rgb_mean, dsm=None, dsm_mean=None):
+def get_seg_result(net, im, rgb_mean, dsm=None, dsm_mean=None, prob_blob_name='prob'):
     blobs = {'data' : None, 'dsm' : None}
     data_blob = np.zeros((1, im.shape[0], im.shape[1], im.shape[2]), 
                             dtype=np.float32)
@@ -86,10 +88,10 @@ def get_seg_result(net, im, rgb_mean, dsm=None, dsm_mean=None):
         
     blobs_out = net.forward(**forward_kwargs)
     
-    seg_prob = net.blobs['prob'].data
+    seg_prob = net.blobs[prob_blob_name].data
     return seg_prob
 
-def test_on_one_image(net, rgb0, rgb_mean, dsm0=None, dsm_mean=None, step_size=250, num_seg_classes=6):
+def test_on_one_image(net, rgb0, rgb_mean, dsm0=None, dsm_mean=None, step_size=250, num_seg_classes=6, prob_blob_name='prob'):
     BLOCK_SIZE = 500  
         
     height, width, num_bands = rgb0.shape
@@ -114,7 +116,7 @@ def test_on_one_image(net, rgb0, rgb_mean, dsm0=None, dsm_mean=None, step_size=2
             if dsm0 is not None:
                 dsm = dsm0[y:y+BLOCK_SIZE, x:x+BLOCK_SIZE]
             # begin detection in a 500x500 image
-            seg_ = get_seg_result(net, im, rgb_mean, dsm, dsm_mean)
+            seg_ = get_seg_result(net, im, rgb_mean, dsm, dsm_mean, prob_blob_name)
             
             if seg_ is not None:
                 seg_result[:, y:y+BLOCK_SIZE, x:x+BLOCK_SIZE] = seg_ 
@@ -130,7 +132,7 @@ if __name__ == '__main__':
     
     rgb_mean = literal_eval(args.rgb_mean)
     dsm_mean = None
-    if args.dsm_mean != None:
+    if args.dsm_mean is not None:
         dsm_mean = literal_eval(args.dsm_mean)
     
     # load net
@@ -154,7 +156,7 @@ if __name__ == '__main__':
         dsm0 = None
         if dsm_mean != None:  
             dsm0 = cv2.imread(dsm_image_path, cv2.IMREAD_GRAYSCALE) 
-        seg_result = test_on_one_image(net, rgb0, rgb_mean, dsm0, dsm_mean, args.step_size)
+        seg_result = test_on_one_image(net, rgb0, rgb_mean, dsm0, dsm_mean, args.step_size, prob_blob_name=args.prob_blob_name)
         
         if seg_result is not None:
             filename = args.save_prefix + '_det_' + args.image_set + '_' + index + '.mat'
