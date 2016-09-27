@@ -95,6 +95,8 @@ def test_on_one_image(net, bgr0, bgr_mean, dsm0=None, dsm_mean=None, step_size=2
     BLOCK_SIZE = 500  
         
     height, width, num_bands = bgr0.shape
+    height_padsize = 0
+    width_padsize = 0
     if height % BLOCK_SIZE:
         height_padsize = BLOCK_SIZE - height % BLOCK_SIZE
     if width % BLOCK_SIZE:
@@ -154,8 +156,9 @@ if __name__ == '__main__':
         dsm_image_path = os.path.join(data_path, 'JPEGImages', index + '_depth.jpg')
         bgr0 = cv2.imread(bgr_image_path) #
         dsm0 = None
-        if dsm_mean != None:  
+        if dsm_mean is not None:  
             dsm0 = cv2.imread(dsm_image_path, cv2.IMREAD_GRAYSCALE) 
+            
         seg_result = test_on_one_image(net, bgr0, bgr_mean, dsm0, dsm_mean, args.step_size, prob_blob_name=args.prob_blob_name)
         
         if seg_result is not None:
